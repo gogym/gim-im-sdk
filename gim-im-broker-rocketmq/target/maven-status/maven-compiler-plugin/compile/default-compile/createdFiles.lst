@@ -1,0 +1,3 @@
+io/getbit/gim/broker/rocketmq/RocketMQBrokerAutoConfiguration.class
+io/getbit/gim/broker/rocketmq/RocketMQMessageStoreConsumer.class
+io/getbit/gim/broker/rocketmq/RocketMQMessageBroker.class

@@ -1,0 +1,157 @@
+package io.getbit.gim.core.connection.server;
+
+import io.getbit.gim.core.config.properties.GimProperties;
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.PooledByteBufAllocator;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.WriteBufferWaterMark;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.SmartLifecycle;
+
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
+
+/**
+ * NettyServer.java
+ *
+ * Netty服务器启动器
+ * 实现 SmartLifecycle，随 Spring 容器自动启停
+ *
+ * @author gogym
+ */
+public class NettyServer implements SmartLifecycle {
+
+    private static final Logger logger = LoggerFactory.getLogger(NettyServer.class);
+
+    private final GimProperties config;
+    private final IMServerFacade facade;
+
+    private volatile boolean running = false;
+    private EventLoopGroup bossGroup;
+    private EventLoopGroup workerGroup;
+    private Channel serverChannel;
+
+    public NettyServer(GimProperties config, IMServerFacade facade) {
+        this.config = config;
+        this.facade = facade;
+    }
+
+    /**
+     * 启动 Netty 服务器（非阻塞，在独立线程中运行）
+     */
+    @Override
+    public void start() {
+        int port = config.getNetty().getPort();
+        int bossThreads = config.getNetty().getBossThreads();
+        int workerThreads = config.getNetty().getWorkerThreads();
+        int backlog = config.getNetty().getBacklog();
+
+        // 计算worker线程数：0表示自动检测CPU核心数
+        int actualWorkerThreads = workerThreads <= 0
+                ? Runtime.getRuntime().availableProcessors() * 2
+                : workerThreads;
+
+        logger.info("Starting Netty Server - Port: {}, Boss: {}, Worker: {}",
+                port, bossThreads, actualWorkerThreads);
+
+        bossGroup = new NioEventLoopGroup(bossThreads,
+                new ThreadFactory() {
+                    private final AtomicInteger index = new AtomicInteger(0);
+                    @Override
+                    public Thread newThread(Runnable r) {
+                        return new Thread(r, "netty-boss-" + index.incrementAndGet());
+                    }
+                });
+
+        workerGroup = new NioEventLoopGroup(actualWorkerThreads,
+                new ThreadFactory() {
+                    private final AtomicInteger index = new AtomicInteger(0);
+                    @Override
+                    public Thread newThread(Runnable r) {
+                        return new Thread(r, "netty-worker-" + index.incrementAndGet());
+                    }
+                });
+
+        Thread serverThread = new Thread(() -> {
+            try {
+                ServerBootstrap b = new ServerBootstrap();
+                b.group(bossGroup, workerGroup)
+                        .channel(NioServerSocketChannel.class)
+                        .childHandler(new GimServerInitializer(facade, facade.getAuthHandler()))
+                        .option(ChannelOption.SO_BACKLOG, backlog)
+                        .childOption(ChannelOption.SO_KEEPALIVE, true)
+                        .childOption(ChannelOption.TCP_NODELAY, true)
+                        .childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
+                        .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
+                        .childOption(ChannelOption.WRITE_BUFFER_WATER_MARK,
+                                new WriteBufferWaterMark(32 * 1024, 256 * 1024))
+                        .childOption(ChannelOption.SO_SNDBUF, 64 * 1024)
+                        .childOption(ChannelOption.SO_RCVBUF, 64 * 1024);
+
+                ChannelFuture f = b.bind(port).sync();
+                serverChannel = f.channel();
+                logger.info("Netty server started, listening on port: {}", port);
+                running = true;
+                serverChannel.closeFuture().sync();
+
+            } catch (Exception e) {
+                logger.error("Netty server startup failed", e);
+                throw new RuntimeException(e);
+            } finally {
+                shutdownGroups();
+            }
+        }, "netty-server");
+        serverThread.setDaemon(true);
+        serverThread.start();
+    }
+
+    /**
+     * 停止 Netty 服务器（优雅关闭）
+     */
+    @Override
+    public void stop() {
+        logger.info("Stopping Netty Server...");
+        running = false;
+        if (serverChannel != null && serverChannel.isActive()) {
+            try {
+                serverChannel.close().sync();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                logger.warn("关闭 serverChannel 被中断", e);
+            }
+        }
+        shutdownGroups();
+        logger.info("Netty Server stopped");
+    }
+
+    private void shutdownGroups() {
+        if (workerGroup != null) {
+            workerGroup.shutdownGracefully();
+        }
+        if (bossGroup != null) {
+            bossGroup.shutdownGracefully();
+        }
+    }
+
+    @Override
+    public boolean isRunning() {
+        return running;
+    }
+
+    @Override
+    public int getPhase() {
+        // 较高 phase，确保在其他 Bean 之后启动、之前停止
+        return Integer.MAX_VALUE - 100;
+    }
+
+    @Override
+    public boolean isAutoStartup() {
+        return true;
+    }
+}

@@ -1,0 +1,9 @@
+io/getbit/gim/webrtc/TurnCredentialService.class
+io/getbit/gim/webrtc/WebRtcSessionStatus.class
+io/getbit/gim/webrtc/dto/WebRtcCallDto.class
+io/getbit/gim/webrtc/WebRtcSessionManager.class
+io/getbit/gim/webrtc/dto/WebRtcSdpDto.class
+io/getbit/gim/webrtc/config/WebRtcAutoConfiguration.class
+io/getbit/gim/webrtc/dto/WebRtcHangupDto.class
+io/getbit/gim/webrtc/dto/WebRtcIceCandidateDto.class
+io/getbit/gim/webrtc/WebRtcSession.class

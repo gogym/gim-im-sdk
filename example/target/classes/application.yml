@@ -1,0 +1,77 @@
+# ============================================================
+# GIM IM SDK 完整配置示例
+# ============================================================
+
+server:
+  port: 8080
+
+# ==================== GIM SDK 配置 ====================
+gim:
+  # Netty 长连接服务器
+  netty:
+    port: 3333                # IM 连接端口
+    boss-threads: 1           # Boss 线程数
+    worker-threads: 0         # Worker 线程数（0=自动检测 CPU 核心数）
+    backlog: 512              # 连接队列大小
+
+  # 心跳配置
+  enable-heart-beat: true     # 开启心跳
+  heart-beat-interval: 30     # 心跳间隔（秒）
+
+  # 离线消息
+  enable-offline: false       # 是否开启离线消息
+
+  # 集群配置
+  enable-cluster: false       # 是否开启集群模式
+  # server-id: server-01      # 集群节点ID（不配置则自动生成）
+
+  # 自动重发
+  auto-rewrite: false         # 是否开启自动重发
+  re-write-num: 3             # 重发次数
+  re-write-delay: 1000        # 重发间隔（毫秒）
+
+  # 消息配置
+  msg:
+    store-topic: im-message-store       # 消息入库 MQ Topic
+    offline-topic: im-message-offline   # 离线消息 MQ Topic
+    ack-timeout-seconds: 10             # ACK 超时时间
+    max-retries: 3                      # 最大重发次数
+
+# ==================== 数据库配置 ====================
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/gim_db?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: your_password
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  # Redis 配置
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      # password: your_redis_password
+      database: 0
+
+# ==================== RocketMQ 配置（可选）====================
+# 配置后自动激活消息入库消费者
+# rocketmq:
+#   name-server: localhost:9876
+#   producer:
+#     group: IM_PRODUCER_GROUP
+#   topic:
+#     im-store: IM_STORE
+
+# ==================== MyBatis-Plus 配置 ====================
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+  global-config:
+    db-config:
+      id-type: assign_id
+
+# ==================== 日志配置 ====================
+logging:
+  level:
+    io.getbit.gim: INFO       # SDK 日志级别
+    com.example.im: DEBUG     # 示例项目日志级别

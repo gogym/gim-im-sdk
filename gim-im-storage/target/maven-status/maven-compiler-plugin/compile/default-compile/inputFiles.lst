@@ -1,0 +1,12 @@
+/Users/gogym/Documents/GitHub/gim-im-sdk/gim-im-storage/src/main/java/io/getbit/gim/storage/service/MessageStoreHandler.java
+/Users/gogym/Documents/GitHub/gim-im-sdk/gim-im-storage/src/main/java/io/getbit/gim/storage/dto/MessageRequests.java
+/Users/gogym/Documents/GitHub/gim-im-sdk/gim-im-storage/src/main/java/io/getbit/gim/storage/spi/ImGroupMemberProvider.java
+/Users/gogym/Documents/GitHub/gim-im-sdk/gim-im-storage/src/main/java/io/getbit/gim/storage/entity/ImUserMessage.java
+/Users/gogym/Documents/GitHub/gim-im-sdk/gim-im-storage/src/main/java/io/getbit/gim/storage/controller/MessageController.java
+/Users/gogym/Documents/GitHub/gim-im-sdk/gim-im-storage/src/main/java/io/getbit/gim/storage/service/MessageStoreProducer.java
+/Users/gogym/Documents/GitHub/gim-im-sdk/gim-im-storage/src/main/java/io/getbit/gim/storage/repository/ImMessageRepository.java
+/Users/gogym/Documents/GitHub/gim-im-sdk/gim-im-storage/src/main/java/io/getbit/gim/storage/config/StorageAutoConfiguration.java
+/Users/gogym/Documents/GitHub/gim-im-sdk/gim-im-storage/src/main/java/io/getbit/gim/storage/repository/ImUserMessageRepository.java
+/Users/gogym/Documents/GitHub/gim-im-sdk/gim-im-storage/src/main/java/io/getbit/gim/storage/entity/ImMessage.java
+/Users/gogym/Documents/GitHub/gim-im-sdk/gim-im-storage/src/main/java/io/getbit/gim/storage/manager/ImMessageManager.java
+/Users/gogym/Documents/GitHub/gim-im-sdk/gim-im-storage/src/main/java/io/getbit/gim/storage/service/MessageService.java

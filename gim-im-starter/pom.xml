@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>io.getbit</groupId>
+        <artifactId>gim-im-sdk</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>gim-im-starter</artifactId>
+    <name>GIM IM Starter</name>
+    <description>One-dependency starter that bundles all GIM IM plugins</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.getbit</groupId>
+            <artifactId>gim-im-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.getbit</groupId>
+            <artifactId>gim-im-broker-rocketmq</artifactId>
+            <version>${gim-im-sdk.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.getbit</groupId>
+            <artifactId>gim-im-storage</artifactId>
+            <version>${gim-im-sdk.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.getbit</groupId>
+            <artifactId>gim-im-friend</artifactId>
+            <version>${gim-im-sdk.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.getbit</groupId>
+            <artifactId>gim-im-group</artifactId>
+            <version>${gim-im-sdk.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.getbit</groupId>
+            <artifactId>gim-im-webrtc</artifactId>
+            <version>${gim-im-sdk.version}</version>
+        </dependency>
+    </dependencies>
+</project>

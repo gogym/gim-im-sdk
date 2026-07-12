@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>io.getbit</groupId>
+    <artifactId>gim-im-sdk</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>GIM IM SDK</name>
+    <description>High-performance, cluster-ready IM SDK based on Netty + Protobuf</description>
+    <url>https://github.com/gogym/gim-im-sdk</url>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>gogym</name>
+            <email>189155278@qq.com</email>
+            <url>https://github.com/gogym</url>
+        </developer>
+    </developers>
+
+    <modules>
+        <module>gim-im-protocol</module>
+        <module>gim-im-core</module>
+        <module>gim-im-broker-rocketmq</module>
+        <module>gim-im-storage</module>
+        <module>gim-im-friend</module>
+        <module>gim-im-group</module>
+        <module>gim-im-webrtc</module>
+        <module>gim-im-starter</module>
+        <module>example</module>
+    </modules>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <java.version>17</java.version>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+
+        <gim-im-sdk.version>1.0.0-SNAPSHOT</gim-im-sdk.version>
+
+        <spring-boot.version>3.5.3</spring-boot.version>
+        <netty.version>4.1.117.Final</netty.version>
+        <protobuf.version>4.32.0</protobuf.version>
+        <jedis.version>4.4.8</jedis.version>
+        <caffeine.version>3.1.8</caffeine.version>
+        <lombok.version>1.18.30</lombok.version>
+        <slf4j.version>2.0.17</slf4j.version>
+        <mybatis-plus.version>3.5.15</mybatis-plus.version>
+        <mysql-connector.version>8.0.33</mysql-connector.version>
+        <rocketmq.version>2.3.5</rocketmq.version>
+        <hutool.version>5.8.26</hutool.version>
+        <netty-tcnative.version>2.0.25.Final</netty-tcnative.version>
+
+        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
+        <protobuf-maven-plugin.version>0.6.1</protobuf-maven-plugin.version>
+        <protoc.version>32.0</protoc.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- Internal modules -->
+            <dependency>
+                <groupId>io.getbit</groupId>
+                <artifactId>gim-im-protocol</artifactId>
+                <version>${gim-im-sdk.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.getbit</groupId>
+                <artifactId>gim-im-core</artifactId>
+                <version>${gim-im-sdk.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.getbit</groupId>
+                <artifactId>gim-im-broker-rocketmq</artifactId>
+                <version>${gim-im-sdk.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.getbit</groupId>
+                <artifactId>gim-im-storage</artifactId>
+                <version>${gim-im-sdk.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.getbit</groupId>
+                <artifactId>gim-im-friend</artifactId>
+                <version>${gim-im-sdk.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.getbit</groupId>
+                <artifactId>gim-im-group</artifactId>
+                <version>${gim-im-sdk.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.getbit</groupId>
+                <artifactId>gim-im-webrtc</artifactId>
+                <version>${gim-im-sdk.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.getbit</groupId>
+                <artifactId>gim-im-starter</artifactId>
+                <version>${gim-im-sdk.version}</version>
+            </dependency>
+
+            <!-- Netty -->
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-all</artifactId>
+                <version>${netty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-tcnative</artifactId>
+                <version>${netty-tcnative.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-tcnative-boringssl-static</artifactId>
+                <version>${netty-tcnative.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+
+            <!-- Protobuf -->
+            <dependency>
+                <groupId>com.google.protobuf</groupId>
+                <artifactId>protobuf-java</artifactId>
+                <version>${protobuf.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.protobuf</groupId>
+                <artifactId>protobuf-java-util</artifactId>
+                <version>${protobuf.version}</version>
+            </dependency>
+
+            <!-- Redis -->
+            <dependency>
+                <groupId>redis.clients</groupId>
+                <artifactId>jedis</artifactId>
+                <version>${jedis.version}</version>
+            </dependency>
+
+            <!-- Caffeine -->
+            <dependency>
+                <groupId>com.github.ben-manes.caffeine</groupId>
+                <artifactId>caffeine</artifactId>
+                <version>${caffeine.version}</version>
+            </dependency>
+
+            <!-- RocketMQ -->
+            <dependency>
+                <groupId>org.apache.rocketmq</groupId>
+                <artifactId>rocketmq-spring-boot-starter</artifactId>
+                <version>${rocketmq.version}</version>
+            </dependency>
+
+            <!-- MyBatis-Plus -->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
+                <version>${mybatis-plus.version}</version>
+            </dependency>
+
+            <!-- MySQL -->
+            <dependency>
+                <groupId>com.mysql</groupId>
+                <artifactId>mysql-connector-j</artifactId>
+                <version>${mysql-connector.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven-compiler-plugin.version}</version>
+                    <configuration>
+                        <source>${java.version}</source>
+                        <target>${java.version}</target>
+                        <encoding>UTF-8</encoding>
+                        <parameters>true</parameters>
+                        <annotationProcessorPaths>
+                            <path>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                                <version>${lombok.version}</version>
+                            </path>
+                        </annotationProcessorPaths>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>
