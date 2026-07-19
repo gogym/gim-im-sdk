@@ -18,7 +18,7 @@ public class ApiResult<T> {
 
     public static <T> ApiResult<T> ok() {
         ApiResult<T> r = new ApiResult<>();
-        r.code = "0";
+        r.code = "200";
         r.msg = "success";
         return r;
     }
@@ -31,7 +31,7 @@ public class ApiResult<T> {
 
     public static <T> ApiResult<T> fail(String msg) {
         ApiResult<T> r = new ApiResult<>();
-        r.code = "-1";
+        r.code = "500";
         r.msg = msg;
         return r;
     }
