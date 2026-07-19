@@ -1,9 +1,0 @@
-/Users/gogym/Documents/GitHub/gim-im-sdk/example/src/main/java/com/example/im/ExampleApplication.java
-/Users/gogym/Documents/GitHub/gim-im-sdk/example/src/main/java/com/example/im/config/MybatisPlusConfig.java
-/Users/gogym/Documents/GitHub/gim-im-sdk/example/src/main/java/com/example/im/controller/DemoController.java
-/Users/gogym/Documents/GitHub/gim-im-sdk/example/src/main/java/com/example/im/spi/IdGeneratorImpl.java
-/Users/gogym/Documents/GitHub/gim-im-sdk/example/src/main/java/com/example/im/spi/ImEventListenerImpl.java
-/Users/gogym/Documents/GitHub/gim-im-sdk/example/src/main/java/com/example/im/spi/RedisAdapterImpl.java
-/Users/gogym/Documents/GitHub/gim-im-sdk/example/src/main/java/com/example/im/spi/RedisSubscriberImpl.java
-/Users/gogym/Documents/GitHub/gim-im-sdk/example/src/main/java/com/example/im/spi/TokenVerifierImpl.java
-/Users/gogym/Documents/GitHub/gim-im-sdk/example/src/main/java/com/example/im/spi/UserInfoProviderImpl.java

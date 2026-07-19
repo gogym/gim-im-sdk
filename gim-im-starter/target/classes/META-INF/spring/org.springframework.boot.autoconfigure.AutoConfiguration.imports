@@ -1,2 +1,0 @@
-io.getbit.gim.core.config.GimAutoConfiguration
-io.getbit.gim.broker.rocketmq.RocketMQBrokerAutoConfiguration

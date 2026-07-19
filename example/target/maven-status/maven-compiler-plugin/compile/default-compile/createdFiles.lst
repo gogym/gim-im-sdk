@@ -1,9 +1,0 @@
-com/example/im/ExampleApplication.class
-com/example/im/controller/DemoController.class
-com/example/im/spi/RedisSubscriberImpl.class
-com/example/im/config/MybatisPlusConfig.class
-com/example/im/spi/RedisAdapterImpl.class
-com/example/im/spi/IdGeneratorImpl.class
-com/example/im/spi/TokenVerifierImpl.class
-com/example/im/spi/ImEventListenerImpl.class
-com/example/im/spi/UserInfoProviderImpl.class
