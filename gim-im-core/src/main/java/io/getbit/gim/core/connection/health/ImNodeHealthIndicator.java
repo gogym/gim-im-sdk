@@ -1,4 +1,4 @@
-package io.getbit.gim.core.health;
+package io.getbit.gim.core.connection.health;
 
 import io.getbit.gim.core.connection.channel.ChannelManager;
 import io.getbit.gim.core.routing.UserRouteService;

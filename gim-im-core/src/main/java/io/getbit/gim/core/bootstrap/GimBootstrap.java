@@ -72,6 +72,7 @@ public class GimBootstrap {
         private ImIdGenerator idGenerator;
         private ImMessageBroker messageBroker;
         private ImUserContextResolver userContextResolver;
+        private ImGroupMemberProvider groupMemberProvider;
         private final List<ImEventListener> eventListeners = new ArrayList<>();
 
         public Builder config(GimProperties config) {
@@ -106,6 +107,11 @@ public class GimBootstrap {
 
         public Builder userContextResolver(ImUserContextResolver userContextResolver) {
             this.userContextResolver = userContextResolver;
+            return this;
+        }
+
+        public Builder groupMemberProvider(ImGroupMemberProvider groupMemberProvider) {
+            this.groupMemberProvider = groupMemberProvider;
             return this;
         }
 
@@ -154,6 +160,7 @@ public class GimBootstrap {
             // 可选组件默认值
             ImRedisSubscriber subscriber = redisSubscriber != null ? redisSubscriber : new NoOpRedisSubscriber();
             ImMessageBroker broker = messageBroker != null ? messageBroker : new NoOpMessageBroker();
+            ImGroupMemberProvider groupProvider = groupMemberProvider != null ? groupMemberProvider : new NoOpGroupMemberProvider();
 
             List<ImEventListener> listeners = eventListeners.isEmpty()
                     ? Collections.emptyList() : Collections.unmodifiableList(eventListeners);
@@ -181,7 +188,7 @@ public class GimBootstrap {
                     channelManager, userRouteService, clusterRouter, listeners, idGenerator, messageAckTracker);
 
             GroupChatHandler groupChatHandler = new GroupChatHandler(
-                    channelManager, userRouteService, clusterRouter, listeners, idGenerator, messageAckTracker);
+                    channelManager, userRouteService, clusterRouter, listeners, idGenerator, messageAckTracker, groupProvider);
 
             DeliveryAckHandler deliveryAckHandler = new DeliveryAckHandler(
                     channelManager, userRouteService, clusterRouter, listeners, messageAckTracker);
@@ -290,6 +297,13 @@ public class GimBootstrap {
     private static class NoOpMessageBroker implements ImMessageBroker {
         @Override
         public void send(String topic, String tag, String key, String body) {
+        }
+    }
+
+    private static class NoOpGroupMemberProvider implements ImGroupMemberProvider {
+        @Override
+        public List<String> getGroupMemberUserIds(String groupId) {
+            return Collections.emptyList();
         }
     }
 }

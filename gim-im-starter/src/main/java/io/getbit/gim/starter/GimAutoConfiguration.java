@@ -4,7 +4,7 @@ import io.getbit.gim.core.bootstrap.GimBootstrap;
 import io.getbit.gim.core.config.properties.GimProperties;
 import io.getbit.gim.core.connection.server.IMServerFacade;
 import io.getbit.gim.core.connection.server.NettyServer;
-import io.getbit.gim.core.health.ImNodeHealthIndicator;
+import io.getbit.gim.core.connection.health.ImNodeHealthIndicator;
 import io.getbit.gim.core.spi.*;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -45,6 +45,7 @@ public class GimAutoConfiguration {
                                                       ImIdGenerator idGenerator,
                                                       ObjectProvider<ImRedisSubscriber> redisSubscriberProvider,
                                                       ObjectProvider<ImMessageBroker> messageBrokerProvider,
+                                                      ObjectProvider<ImGroupMemberProvider> groupMemberProviderProvider,
                                                       ObjectProvider<List<ImEventListener>> eventListenersProvider) {
         GimBootstrap.Builder builder = GimBootstrap.builder()
                 .config(config)
@@ -60,6 +61,11 @@ public class GimAutoConfiguration {
         ImMessageBroker broker = messageBrokerProvider.getIfAvailable();
         if (broker != null) {
             builder.messageBroker(broker);
+        }
+
+        ImGroupMemberProvider groupProvider = groupMemberProviderProvider.getIfAvailable();
+        if (groupProvider != null) {
+            builder.groupMemberProvider(groupProvider);
         }
 
         List<ImEventListener> listeners = eventListenersProvider.getIfAvailable(Collections::emptyList);

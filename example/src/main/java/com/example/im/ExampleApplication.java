@@ -25,6 +25,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  *   <li>{@code ImTokenVerifier}     — Token 验证（必须）</li>
  *   <li>{@code ImIdGenerator}       — 消息 ID 生成（必须）</li>
  *   <li>{@code ImRedisSubscriber}   — Redis 订阅（集群模式必须）</li>
+ *   <li>{@code ImGroupMemberProvider} — 群组成员查询（群聊功能必须）</li>
  *   <li>{@code ImEventListener}     — 事件监听（可选）</li>
  *   <li>{@code ImMessageBroker}     — MQ 适配（可选，默认 NoOp）</li>
  *   <li>{@code ImUserContextResolver} — 用户上下文（可选，默认从请求头获取）</li>
