@@ -1,6 +1,7 @@
 package io.getbit.gim.core.routing;
 
 import io.getbit.gim.core.cache.CacheKeyBuilder;
+import io.getbit.gim.core.config.properties.CacheProperties;
 import io.getbit.gim.core.config.properties.GimProperties;
 import io.getbit.gim.core.spi.ImRedisAdapter;
 import com.github.benmanes.caffeine.cache.Cache;
@@ -37,17 +38,24 @@ public class UserRouteService {
     /**
      * 本地缓存：userId → serverId
      */
-    private final Cache<String, String> localCache = Caffeine.newBuilder()
-            .expireAfterWrite(ROUTE_EXPIRE_SECONDS, TimeUnit.SECONDS)
-            .maximumSize(100_000)
-            .build();
+    private final Cache<String, String> localCache;
 
     private final GimProperties config;
     private final ImRedisAdapter redisAdapter;
 
     public UserRouteService(GimProperties config, ImRedisAdapter redisAdapter) {
+        this(config, redisAdapter, null);
+    }
+
+    public UserRouteService(GimProperties config, ImRedisAdapter redisAdapter, CacheProperties cacheProperties) {
         this.config = config;
         this.redisAdapter = redisAdapter;
+        int maxSize = cacheProperties != null ? cacheProperties.getMaxSize() : 100_000;
+        int expireSeconds = cacheProperties != null ? cacheProperties.getExpireSeconds() : 300;
+        this.localCache = Caffeine.newBuilder()
+                .expireAfterWrite(expireSeconds, TimeUnit.SECONDS)
+                .maximumSize(maxSize)
+                .build();
     }
 
     // ====================== 路由管理 ======================

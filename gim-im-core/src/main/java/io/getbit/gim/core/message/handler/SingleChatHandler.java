@@ -99,6 +99,9 @@ public class SingleChatHandler extends BaseHandler {
                 fireOfflineChat(enrichedMsg, receiverId, "OFFLINE");
             }
 
+            // 7. 触发聊天消息回调（业务层持久化）
+            fireChatMessage(enrichedMsg, userId, receiverId, 1);
+
             logger.debug("单聊消息处理完成: msgId={}, from={}, to={}", msgId, userId, receiverId);
 
         } catch (Exception e) {

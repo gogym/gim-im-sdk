@@ -2,14 +2,13 @@ package com.example.im;
 
 import io.getbit.gim.core.bootstrap.GimBootstrap;
 import io.getbit.gim.core.config.properties.GimProperties;
-import io.getbit.gim.core.connection.server.IMServerFacade;
+import io.getbit.gim.core.connection.IMServerFacade;
 import io.getbit.gim.core.spi.*;
 import io.getbit.gim.protocol.codec.DeviceType;
 import io.getbit.gim.protocol.codec.ImProto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -142,11 +141,6 @@ public class NonSpringExample {
 
         @Override
         public void publish(String channel, String message) {
-            // TODO
-        }
-
-        @Override
-        public void set(String key, String value) {
             // TODO
         }
     }

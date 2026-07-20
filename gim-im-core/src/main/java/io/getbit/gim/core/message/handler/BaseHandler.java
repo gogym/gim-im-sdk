@@ -16,13 +16,13 @@ import java.util.Map;
 
 /**
  * BaseHandler.java
- *
+ * <p>
  * 消息处理器基类
- *
+ * <p>
  * 子类必须实现：
  * - cmd()：声明当前 Handler 处理的指令类型
  * - handle()：具体业务处理逻辑
- *
+ * <p>
  * 公共能力：路由 / 投递 / Channel 查询
  *
  * @author gogym
@@ -56,7 +56,7 @@ public abstract class BaseHandler {
     /**
      * 处理消息
      *
-     * @param packet 客户端上行 Packet
+     * @param packet  客户端上行 Packet
      * @param channel 当前连接 Channel
      * @param userId  当前用户 ID
      */
@@ -70,13 +70,13 @@ public abstract class BaseHandler {
      * @return true=投递成功, false=用户离线
      */
     protected boolean routeToUser(String receiverId, ImProto.Packet packet) {
-        if (userRouteService.isLocal(receiverId)) {
+        if (isLocal(receiverId)) {
             return deliverToLocal(receiverId, packet);
         }
 
-        String targetServerId = userRouteService.getServerId(receiverId);
+        String targetServerId = getServerId(receiverId);
         if (targetServerId != null) {
-            clusterMessageRouter.routeToRemote(targetServerId, packet, receiverId);
+            routeToRemote(targetServerId, packet, receiverId);
             return true;
         }
 
@@ -89,7 +89,7 @@ public abstract class BaseHandler {
      * @return true=至少有一个设备投递成功
      */
     protected boolean deliverToLocal(String receiverId, ImProto.Packet packet) {
-        var deviceChannels = channelManager.getChannels(receiverId);
+        var deviceChannels = getChannels(receiverId);
         if (deviceChannels.isEmpty()) {
             return false;
         }
@@ -134,6 +134,19 @@ public abstract class BaseHandler {
     }
 
     // ====================== 离线消息回调 ======================
+
+    /**
+     * 触发聊天消息回调（所有消息均触发，用于业务层持久化）
+     */
+    protected void fireChatMessage(ImProto.ChatMessage chatMsg, String senderId, String receiverId, int chatType) {
+        for (ImEventListener listener : eventListeners) {
+            try {
+                listener.onChatMessage(chatMsg, senderId, receiverId, chatType);
+            } catch (Exception e) {
+                logger.error("聊天消息回调异常, receiver={}", receiverId, e);
+            }
+        }
+    }
 
     /**
      * 触发离线聊天消息回调（接收方不在线时调用）

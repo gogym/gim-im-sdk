@@ -14,12 +14,6 @@ import lombok.Setter;
 @Setter
 public class MessageProperties {
 
-    /** 消息存储 MQ Topic */
-    private String storeTopic = "im-message-store";
-
-    /** 离线消息 MQ Topic */
-    private String offlineTopic = "im-message-offline";
-
     /** ACK 超时时间（秒） */
     private int ackTimeoutSeconds = 10;
 

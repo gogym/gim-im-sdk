@@ -153,16 +153,6 @@ public class GimProperties {
             return this;
         }
 
-        public Builder storeTopic(String topic) {
-            props.getMsg().setStoreTopic(topic);
-            return this;
-        }
-
-        public Builder offlineTopic(String topic) {
-            props.getMsg().setOfflineTopic(topic);
-            return this;
-        }
-
         public Builder ackTimeoutSeconds(int seconds) {
             props.getMsg().setAckTimeoutSeconds(seconds);
             return this;

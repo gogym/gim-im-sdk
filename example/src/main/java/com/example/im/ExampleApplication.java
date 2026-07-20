@@ -27,9 +27,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  *   <li>{@code ImRedisSubscriber}   — Redis 订阅（集群模式必须）</li>
  *   <li>{@code ImGroupMemberProvider} — 群组成员查询（群聊功能必须）</li>
  *   <li>{@code ImFriendProvider}      — 好友关系查询（好友校验/在线状态同步必须）</li>
- *   <li>{@code ImEventListener}     — 事件监听（可选）</li>
- *   <li>{@code ImMessageBroker}     — MQ 适配（可选，默认 NoOp）</li>
- *   <li>{@code ImUserContextResolver} — 用户上下文（可选，默认从请求头获取）</li>
+ *   <li>{@code ImEventListener}     — 事件监听（可选，消息持久化也通过此接口处理）</li>
  * </ul>
  * <p>
  * 3. 配置 application.yml（参见 resources/application.yml）

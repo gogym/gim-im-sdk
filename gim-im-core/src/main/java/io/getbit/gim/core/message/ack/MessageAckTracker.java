@@ -26,14 +26,14 @@ public class MessageAckTracker {
     private static final Logger logger = LoggerFactory.getLogger(MessageAckTracker.class);
 
     /**
-     * ACK超时时间（秒）
-     */
-    private static final int ACK_TIMEOUT_SECONDS = 10;
-
-    /**
      * 最大追踪数量
      */
     private static final int MAX_TRACK_SIZE = 100_000;
+
+    /**
+     * ACK超时时间（秒），从 MessageProperties 接入
+     */
+    private final int ackTimeoutSeconds;
 
     private final List<ImEventListener> eventListeners;
 
@@ -43,13 +43,14 @@ public class MessageAckTracker {
     private final Cache<String, AckInfo> pendingAcks;
 
     public MessageAckTracker() {
-        this(Collections.emptyList());
+        this(10, Collections.emptyList());
     }
 
-    public MessageAckTracker(List<ImEventListener> eventListeners) {
+    public MessageAckTracker(int ackTimeoutSeconds, List<ImEventListener> eventListeners) {
+        this.ackTimeoutSeconds = ackTimeoutSeconds > 0 ? ackTimeoutSeconds : 10;
         this.eventListeners = eventListeners != null ? eventListeners : Collections.emptyList();
         this.pendingAcks = Caffeine.newBuilder()
-                .expireAfterWrite(ACK_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+                .expireAfterWrite(this.ackTimeoutSeconds, TimeUnit.SECONDS)
                 .maximumSize(MAX_TRACK_SIZE)
                 .removalListener((String key, AckInfo value, com.github.benmanes.caffeine.cache.RemovalCause cause) -> {
                     if (cause == com.github.benmanes.caffeine.cache.RemovalCause.EXPIRED && value != null) {

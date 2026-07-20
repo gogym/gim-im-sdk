@@ -3,7 +3,7 @@ package io.getbit.gim.core.bootstrap;
 import io.getbit.gim.core.config.properties.GimProperties;
 import io.getbit.gim.core.connection.auth.ConnectionAuthHandler;
 import io.getbit.gim.core.connection.channel.ChannelManager;
-import io.getbit.gim.core.connection.server.IMServerFacade;
+import io.getbit.gim.core.connection.IMServerFacade;
 import io.getbit.gim.core.connection.server.NettyServer;
 import io.getbit.gim.core.friend.FriendNotifyService;
 import io.getbit.gim.core.group.GroupNotifyService;
@@ -76,8 +76,6 @@ public class GimBootstrap {
         private ImRedisAdapter redisAdapter;
         private ImRedisSubscriber redisSubscriber;
         private ImIdGenerator idGenerator;
-        private ImMessageBroker messageBroker;
-        private ImUserContextResolver userContextResolver;
         private ImGroupMemberProvider groupMemberProvider;
         private ImFriendProvider friendProvider;
         private final List<ImEventListener> eventListeners = new ArrayList<>();
@@ -104,16 +102,6 @@ public class GimBootstrap {
 
         public Builder idGenerator(ImIdGenerator idGenerator) {
             this.idGenerator = idGenerator;
-            return this;
-        }
-
-        public Builder messageBroker(ImMessageBroker messageBroker) {
-            this.messageBroker = messageBroker;
-            return this;
-        }
-
-        public Builder userContextResolver(ImUserContextResolver userContextResolver) {
-            this.userContextResolver = userContextResolver;
             return this;
         }
 
@@ -161,6 +149,8 @@ public class GimBootstrap {
         public StartContext buildWithServer() {
             Assembly assembly = assemble();
             NettyServer nettyServer = new NettyServer(config, assembly.facade);
+            // 延迟注入 NettyServer 到健康指标，用于检查 Netty 运行状态
+            assembly.facade.getHealthIndicator().setNettyServer(nettyServer);
             return new StartContext(assembly.facade, nettyServer, assembly.clusterRouter);
         }
 
@@ -175,7 +165,6 @@ public class GimBootstrap {
 
             // 可选组件默认值
             ImRedisSubscriber subscriber = redisSubscriber != null ? redisSubscriber : new NoOpRedisSubscriber();
-            ImMessageBroker broker = messageBroker != null ? messageBroker : new NoOpMessageBroker();
             ImGroupMemberProvider groupProvider = groupMemberProvider != null ? groupMemberProvider : new NoOpGroupMemberProvider();
 
             List<ImEventListener> listeners = eventListeners.isEmpty()
@@ -183,11 +172,14 @@ public class GimBootstrap {
 
             // ========== 组装核心组件 ==========
 
+            // 使用 CacheProperties 配置缓存参数
             ChannelManager channelManager = new ChannelManager(config);
 
-            UserRouteService userRouteService = new UserRouteService(config, redisAdapter);
+            UserRouteService userRouteService = new UserRouteService(config, redisAdapter, config.getCache());
 
-            MessageAckTracker messageAckTracker = new MessageAckTracker(listeners);
+            // 使用 MessageProperties 配置 ACK 超时
+            MessageAckTracker messageAckTracker = new MessageAckTracker(
+                    config.getMsg().getAckTimeoutSeconds(), listeners);
 
             ConnectionAuthHandler authHandler = new ConnectionAuthHandler(
                     tokenVerifier, channelManager, config, userRouteService);
@@ -240,15 +232,19 @@ public class GimBootstrap {
                     deliveryAckHandler, readReceiptHandler, msgRecallHandler, rtcSignalHandler);
             DefaultMessageDispatcher messageDispatcher = new DefaultMessageDispatcher(handlers);
 
-            // 门面
+            // 门面（内置 ImNodeHealthIndicator，传入 Redis 组件用于健康检查）
             IMServerFacade facade = new IMServerFacade(
                     config, channelManager, messageDispatcher, authHandler, userRouteService,
-                    listeners, friendNotifyService, groupNotifyService);
+                    listeners, friendNotifyService, groupNotifyService, redisAdapter, subscriber);
 
-            logger.info("GIM SDK 组件组装完成, serverId={}, cluster={}, friend={}, group={}",
+            // 注入 MessageAckTracker 到健康指标，用于监控待确认消息数
+            facade.getHealthIndicator().setMessageAckTracker(messageAckTracker);
+
+            logger.info("GIM SDK 组件组装完成, serverId={}, cluster={}, friend={}, group={}, ackTimeout={}s",
                     config.getServerId(), config.isEnableCluster(),
                     friendNotifyService != null ? "enabled" : "disabled",
-                    "enabled");
+                    "enabled",
+                    config.getMsg().getAckTimeoutSeconds());
 
             return new Assembly(facade, clusterRouter);
         }
@@ -326,12 +322,6 @@ public class GimBootstrap {
         @Override
         public boolean isSubscribed() {
             return false;
-        }
-    }
-
-    private static class NoOpMessageBroker implements ImMessageBroker {
-        @Override
-        public void send(String topic, String tag, String key, String body) {
         }
     }
 

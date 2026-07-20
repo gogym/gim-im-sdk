@@ -1,4 +1,4 @@
-package io.getbit.gim.core.connection;
+package io.getbit.gim.core.connection.channel;
 
 import io.getbit.gim.protocol.codec.DeviceType;
 

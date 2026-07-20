@@ -68,4 +68,25 @@ public interface ImEventListener {
      * @param chatType      聊天类型（1=单聊 2=群聊）
      */
     default void onMessageRecalled(String msgId, String conversationId, String operatorId, int chatType) {}
+
+    /**
+     * 已读回执回调
+     * 当无法自动路由已读回执时（如群聊场景），通过此回调通知使用方处理
+     *
+     * @param readerId       已读用户ID
+     * @param conversationId 会话ID
+     * @param lastReadMsgId  最后已读的消息ID
+     */
+    default void onReadReceipt(String readerId, String conversationId, String lastReadMsgId) {}
+
+    /**
+     * 聊天消息回调（所有聊天消息均触发，无论接收方是否在线）
+     * 使用方可实现此方法进行消息持久化（写入 DB / 发送到 MQ 等）
+     *
+     * @param chatMsg   聊天消息
+     * @param senderId  发送者ID
+     * @param receiverId 接收方ID（单聊为用户ID，群聊为群组ID）
+     * @param chatType  聊天类型（1=单聊 2=群聊）
+     */
+    default void onChatMessage(ImProto.ChatMessage chatMsg, String senderId, String receiverId, int chatType) {}
 }

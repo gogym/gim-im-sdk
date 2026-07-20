@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
  *   <li>onOfflineNotify — 离线通知消息（好友申请、群通知等）</li>
  *   <li>onMessageDeliveryFailed — 消息投递失败</li>
  *   <li>onMessageRecalled — 消息撤回（可更新 DB 消息状态）</li>
+ *   <li>onChatMessage — 聊天消息（可持久化到 DB / MQ）</li>
  * </ul>
  */
 @Component
@@ -63,5 +64,13 @@ public class ImEventListenerImpl implements ImEventListener {
                 msgId, conversationId, operatorId, chatType);
         // TODO: 更新 DB 中消息状态为已撤回
         // messageRepository.updateRecalled(msgId);
+    }
+
+    @Override
+    public void onChatMessage(ImProto.ChatMessage chatMsg, String senderId, String receiverId, int chatType) {
+        log.info("[IM事件] 聊天消息: msgId={}, from={}, to={}, chatType={}",
+                chatMsg.getMsgId(), senderId, receiverId, chatType);
+        // TODO: 消息持久化到 DB 或发送到 MQ
+        // messageRepository.save(chatMsg);
     }
 }

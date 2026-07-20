@@ -41,24 +41,4 @@ public interface ImRedisAdapter {
      * @param message message body
      */
     void publish(String channel, String message);
-
-    /**
-     * SET a key without expiration
-     *
-     * @param key   Redis key
-     * @param value value
-     */
-    void set(String key, String value);
-
-    /**
-     * SET with millisecond expiration
-     *
-     * @param key    Redis key
-     * @param millis TTL in milliseconds
-     * @param value  value
-     */
-    default void psetex(String key, long millis, String value) {
-        // default: convert to seconds
-        setex(key, (int) (millis / 1000), value);
-    }
 }

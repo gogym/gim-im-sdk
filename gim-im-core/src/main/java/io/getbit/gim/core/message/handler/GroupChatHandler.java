@@ -61,7 +61,16 @@ public class GroupChatHandler extends BaseHandler {
             ImProto.ChatMessage chatMsg = PacketCodec.parseChatMessage(packet);
             String groupId = chatMsg.getReceiverId();
 
-            // 1. 禁言检查
+            // 1. 群成员资格校验
+            if (!groupMemberProvider.isGroupMember(groupId, userId)) {
+                logger.info("群消息被拒绝(非群成员): userId={}, groupId={}", userId, groupId);
+                ImProto.Packet rejectAck = PacketCodec.buildServerAckFail(
+                        packet.getRequestId(), 403, packet.getSequence());
+                channel.writeAndFlush(rejectAck);
+                return;
+            }
+
+            // 2. 禁言检查
             String muteReason = groupMemberProvider.checkCanSendMessage(groupId, userId);
             if (muteReason != null) {
                 logger.info("群消息被拒绝: userId={}, groupId={}, reason={}", userId, groupId, muteReason);
@@ -71,17 +80,17 @@ public class GroupChatHandler extends BaseHandler {
                 return;
             }
 
-            // 2. 生成消息ID
+            // 3. 生成消息ID
             String msgId = (chatMsg.getMsgId() == null || chatMsg.getMsgId().isEmpty())
                     ? idGenerator.generateMsgId()
                     : chatMsg.getMsgId();
 
-            // 3. 构建带 msgId 的完整消息
+            // 4. 构建带 msgId 的完整消息
             ImProto.ChatMessage enrichedMsg = chatMsg.toBuilder()
                     .setMsgId(msgId)
                     .build();
 
-            // 4. 回复 ServerAck 给发送方
+            // 5. 回复 ServerAck 给发送方
             String requestId = packet.getRequestId();
             ImProto.Packet ack = PacketCodec.buildServerAck(
                     requestId != null ? requestId : "",
@@ -89,8 +98,11 @@ public class GroupChatHandler extends BaseHandler {
                     packet.getSequence());
             channel.writeAndFlush(ack);
 
-            // 5. 路由投递给在线群成员
+            // 6. 路由投递给在线群成员
             routeToMembers(enrichedMsg, userId, groupId);
+
+            // 7. 触发聊天消息回调（业务层持久化）
+            fireChatMessage(enrichedMsg, userId, groupId, 2);
 
             logger.debug("群聊消息处理完成: msgId={}, from={}, group={}", msgId, userId, groupId);
 

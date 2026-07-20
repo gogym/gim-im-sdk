@@ -48,14 +48,4 @@ public class RedisAdapterImpl implements ImRedisAdapter {
     public void publish(String channel, String message) {
         redisTemplate.convertAndSend(channel, message);
     }
-
-    @Override
-    public void set(String key, String value) {
-        redisTemplate.opsForValue().set(key, value);
-    }
-
-    @Override
-    public void psetex(String key, long millis, String value) {
-        redisTemplate.opsForValue().set(key, value, millis, TimeUnit.MILLISECONDS);
-    }
 }

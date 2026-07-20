@@ -162,8 +162,60 @@ public class ClusterMessageRouter {
             }
 
         } else {
-            // 其他通知类型：直接转发给本地用户
-            logger.debug("集群消息投递: cmd={}", cmd);
+            // 通知类型（好友通知/群通知/在线状态/撤回通知等）：
+            // 根据消息体中的目标用户进行本地投递
+            deliverNotifyLocally(packet, cmd);
+        }
+    }
+
+    /**
+     * 投递通知类型消息到本地用户
+     * 不同通知类型的目标用户字段不同，需分别解析
+     */
+    private void deliverNotifyLocally(ImProto.Packet packet, int cmd) {
+        try {
+            String targetUserId = null;
+
+            // 根据 cmd 解析目标用户
+            if (cmd == Cmd.FRIEND_REQUEST_NOTIFY) {
+                ImProto.FriendRequestNotify notify = PacketCodec.parseFriendRequestNotify(packet);
+                targetUserId = notify.getToUserId();
+            } else if (cmd == Cmd.FRIEND_STATUS_NOTIFY) {
+                ImProto.FriendStatusNotify notify = PacketCodec.parseFriendStatusNotify(packet);
+                targetUserId = notify.getToUserId();
+            } else if (cmd == Cmd.ONLINE_STATUS_NOTIFY) {
+                // 在线状态通知：投递给所有本地用户（由上层广播）
+                // 这里无法确定具体目标，跳过
+                logger.debug("集群在线状态通知: userId={}", cmd);
+                return;
+            } else if (cmd == Cmd.MSG_RECALL_NOTIFY) {
+                // 撤回通知：需要广播给群成员或单聊对方
+                // 由 MsgRecallHandler 自行处理，集群场景已在 handler 中逐个 routeToUser
+                return;
+            }
+
+            if (targetUserId != null && !targetUserId.isEmpty()) {
+                var targetChannels = channelManager.getChannels(targetUserId);
+                if (!targetChannels.isEmpty()) {
+                    targetChannels.values().forEach(ch -> {
+                        if (ch.isActive()) {
+                            ch.writeAndFlush(packet);
+                        }
+                    });
+                    logger.debug("集群通知本地投递成功: cmd={}, receiver={}", cmd, targetUserId);
+                } else {
+                    // 用户不在线，触发离线通知回调
+                    for (ImEventListener listener : eventListeners) {
+                        try {
+                            listener.onOfflineNotify(packet, targetUserId);
+                        } catch (Exception e) {
+                            logger.error("集群通知离线回调异常: receiver={}", targetUserId, e);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.error("集群通知本地投递失败: cmd={}", cmd, e);
         }
     }
 

@@ -2,8 +2,6 @@ package com.example.im;
 
 import io.getbit.gim.core.bootstrap.GimBootstrap;
 import io.getbit.gim.core.config.properties.GimProperties;
-import io.getbit.gim.core.connection.server.IMServerFacade;
-import io.getbit.gim.core.routing.ClusterMessageRouter;
 import io.getbit.gim.core.spi.*;
 import io.getbit.gim.protocol.codec.DeviceType;
 import io.getbit.gim.protocol.codec.ImProto;
@@ -11,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -218,16 +215,6 @@ public class ClusterExample {
         public void publish(String channel, String message) {
             // 跨节点消息转发：PUBLISH 到目标节点的 channel
             // jedis.publish(channel, message);
-        }
-
-        @Override
-        public void set(String key, String value) {
-            // jedis.set(key, value);
-        }
-
-        @Override
-        public void psetex(String key, long millis, String value) {
-            // jedis.psetex(key, millis, value);
         }
     }
 

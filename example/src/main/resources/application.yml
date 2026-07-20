@@ -42,8 +42,6 @@ gim:
 
   # 消息配置
   msg:
-    store-topic: im-message-store       # 消息入库 MQ Topic
-    offline-topic: im-message-offline   # 离线消息 MQ Topic
     ack-timeout-seconds: 10             # ACK 超时时间
     max-retries: 3                      # 最大重发次数
 

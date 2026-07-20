@@ -1,7 +1,7 @@
 package io.getbit.gim.core.connection.channel;
 
+import io.getbit.gim.core.config.properties.CacheProperties;
 import io.getbit.gim.core.config.properties.GimProperties;
-import io.getbit.gim.core.connection.ConnectionInfo;
 import io.getbit.gim.protocol.codec.DeviceType;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -33,7 +33,29 @@ public class ChannelManager {
     private final String serverId;
 
     public ChannelManager(GimProperties config) {
-        this.serverId = config.getServerId();
+        this(config.getServerId(), config.getCache());
+    }
+
+    public ChannelManager(String serverId, CacheProperties cacheProperties) {
+        this.serverId = serverId;
+        int maxSize = cacheProperties != null ? cacheProperties.getMaxSize() : 100_000;
+        int expireSeconds = cacheProperties != null ? cacheProperties.getExpireSeconds() : 300;
+        this.connections = Caffeine.newBuilder()
+                .expireAfterAccess(expireSeconds, TimeUnit.SECONDS)
+                .maximumSize(maxSize)
+                .build();
+        this.userChannels = Caffeine.newBuilder()
+                .expireAfterAccess(expireSeconds, TimeUnit.SECONDS)
+                .maximumSize(maxSize)
+                .removalListener((String userId, Map<DeviceType, Channel> deviceMap, com.github.benmanes.caffeine.cache.RemovalCause cause) -> {
+                    if (deviceMap != null) {
+                        for (Channel ch : deviceMap.values()) {
+                            connections.invalidate(ch.id().asLongText());
+                        }
+                        logger.debug("userChannels evicted: userId={}, cause={}", userId, cause);
+                    }
+                })
+                .build();
     }
 
     /**
@@ -45,26 +67,12 @@ public class ChannelManager {
     /**
      * channelId -> ConnectionInfo（反向映射，用于断连时快速查找）
      */
-    private final Cache<String, ConnectionInfo> connections = Caffeine.newBuilder()
-            .expireAfterAccess(1, TimeUnit.HOURS)
-            .maximumSize(200_000)
-            .build();
+    private final Cache<String, ConnectionInfo> connections;
 
     /**
      * userId -> Map<DeviceType, Channel>（多设备支持）
      */
-    private final Cache<String, Map<DeviceType, Channel>> userChannels = Caffeine.newBuilder()
-            .expireAfterAccess(1, TimeUnit.HOURS)
-            .maximumSize(100_000)
-            .removalListener((String userId, Map<DeviceType, Channel> deviceMap, com.github.benmanes.caffeine.cache.RemovalCause cause) -> {
-                if (deviceMap != null) {
-                    for (Channel ch : deviceMap.values()) {
-                        connections.invalidate(ch.id().asLongText());
-                    }
-                    logger.debug("userChannels evicted: userId={}, cause={}", userId, cause);
-                }
-            })
-            .build();
+    private final Cache<String, Map<DeviceType, Channel>> userChannels;
 
     // ====================== 绑定与解绑 ======================
 

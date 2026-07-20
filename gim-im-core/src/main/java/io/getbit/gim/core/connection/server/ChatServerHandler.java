@@ -1,7 +1,8 @@
 package io.getbit.gim.core.connection.server;
 
+import io.getbit.gim.core.connection.IMServerFacade;
 import io.getbit.gim.protocol.codec.*;
-import io.getbit.gim.core.connection.ConnectionInfo;
+import io.getbit.gim.core.connection.channel.ConnectionInfo;
 import io.getbit.gim.core.connection.auth.ConnectionAuthHandler;
 import io.netty.handler.codec.DecoderException;
 import io.netty.channel.Channel;

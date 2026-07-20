@@ -1,13 +1,16 @@
-package io.getbit.gim.core.connection.server;
+package io.getbit.gim.core.connection;
 
 import io.getbit.gim.core.config.properties.GimProperties;
 import io.getbit.gim.core.connection.channel.ChannelManager;
 import io.getbit.gim.core.connection.auth.ConnectionAuthHandler;
+import io.getbit.gim.core.connection.health.ImNodeHealthIndicator;
 import io.getbit.gim.core.friend.FriendNotifyService;
 import io.getbit.gim.core.group.GroupNotifyService;
 import io.getbit.gim.core.message.handler.MessageDispatcher;
 import io.getbit.gim.core.routing.UserRouteService;
 import io.getbit.gim.core.spi.ImEventListener;
+import io.getbit.gim.core.spi.ImRedisAdapter;
+import io.getbit.gim.core.spi.ImRedisSubscriber;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,13 +42,19 @@ public class IMServerFacade {
     /** 群组通知推送服务（可选，未配置 ImGroupMemberProvider 时为 null） */
     @Getter private GroupNotifyService groupNotifyService;
 
+    /** 节点健康指标 */
+    @Getter private ImNodeHealthIndicator healthIndicator;
+
+    /** 连接管理服务 */
+    @Getter private ConnectionService connectionService;
+
     public IMServerFacade(GimProperties config,
                           ChannelManager channelManager,
                           MessageDispatcher messageDispatcher,
                           ConnectionAuthHandler authHandler,
                           UserRouteService userRouteService,
                           List<ImEventListener> eventListeners) {
-        this(config, channelManager, messageDispatcher, authHandler, userRouteService, eventListeners, null, null);
+        this(config, channelManager, messageDispatcher, authHandler, userRouteService, eventListeners, null, null, null, null);
     }
 
     public IMServerFacade(GimProperties config,
@@ -56,6 +65,20 @@ public class IMServerFacade {
                           List<ImEventListener> eventListeners,
                           FriendNotifyService friendNotifyService,
                           GroupNotifyService groupNotifyService) {
+        this(config, channelManager, messageDispatcher, authHandler, userRouteService, eventListeners,
+                friendNotifyService, groupNotifyService, null, null);
+    }
+
+    public IMServerFacade(GimProperties config,
+                          ChannelManager channelManager,
+                          MessageDispatcher messageDispatcher,
+                          ConnectionAuthHandler authHandler,
+                          UserRouteService userRouteService,
+                          List<ImEventListener> eventListeners,
+                          FriendNotifyService friendNotifyService,
+                          GroupNotifyService groupNotifyService,
+                          ImRedisAdapter redisAdapter,
+                          ImRedisSubscriber redisSubscriber) {
         this.config = config;
         this.channelManager = channelManager;
         this.messageDispatcher = messageDispatcher;
@@ -64,23 +87,12 @@ public class IMServerFacade {
         this.eventListeners = eventListeners;
         this.friendNotifyService = friendNotifyService;
         this.groupNotifyService = groupNotifyService;
+        this.healthIndicator = new ImNodeHealthIndicator(
+                channelManager, userRouteService, redisAdapter, redisSubscriber, config.isEnableCluster());
+        this.connectionService = new ConnectionService(channelManager, userRouteService, this);
 
         logger.info("IMServerFacade 初始化完成, serverId={}, cluster={}",
                 config.getServerId(), config.isEnableCluster());
-    }
-
-    /**
-     * 设置好友通知服务（由 GimBootstrap 组装后设置）
-     */
-    public void setFriendNotifyService(FriendNotifyService friendNotifyService) {
-        this.friendNotifyService = friendNotifyService;
-    }
-
-    /**
-     * 设置群组通知服务（由 GimBootstrap 组装后设置）
-     */
-    public void setGroupNotifyService(GroupNotifyService groupNotifyService) {
-        this.groupNotifyService = groupNotifyService;
     }
 
     /**
