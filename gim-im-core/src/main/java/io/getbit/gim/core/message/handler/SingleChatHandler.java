@@ -69,7 +69,7 @@ public class SingleChatHandler extends BaseHandler {
             }
 
             // 2. 生成消息ID
-            String msgId = (chatMsg.getMsgId() == null || chatMsg.getMsgId().isEmpty())
+            String msgId = chatMsg.getMsgId().isEmpty()
                     ? idGenerator.generateMsgId()
                     : chatMsg.getMsgId();
 
@@ -82,7 +82,7 @@ public class SingleChatHandler extends BaseHandler {
             // 4. 回复 ServerAck 给发送方
             String requestId = packet.getRequestId();
             ImProto.Packet ack = PacketCodec.buildServerAck(
-                    requestId != null ? requestId : "",
+                    requestId,
                     msgId,
                     packet.getSequence());
             channel.writeAndFlush(ack);

@@ -80,7 +80,7 @@ public class ConnectionAuthHandler {
             String deviceStr = bindReq.getDevice();
 
             // 1. 参数校验
-            if (userId == null || userId.isEmpty() || token == null || token.isEmpty()) {
+            if (userId.isEmpty() || token.isEmpty()) {
                 logger.warn("绑定失败: userId 或 token 为空, channelId={}", channel.id().asShortText());
                 sendBindFail(channel, packet.getSequence(), 401, "userId and token required");
                 return false;

@@ -63,7 +63,7 @@ public class MsgRecallHandler extends BaseHandler {
             // 1. 回复发送方 ServerAck（成功）
             String requestId = packet.getRequestId();
             ImProto.Packet ack = PacketCodec.buildServerAck(
-                    requestId != null ? requestId : "",
+                    requestId,
                     msgId,
                     packet.getSequence());
             channel.writeAndFlush(ack);

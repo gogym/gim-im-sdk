@@ -81,7 +81,8 @@ public class GroupChatHandler extends BaseHandler {
             }
 
             // 3. 生成消息ID
-            String msgId = (chatMsg.getMsgId() == null || chatMsg.getMsgId().isEmpty())
+            chatMsg.getMsgId();
+            String msgId = chatMsg.getMsgId().isEmpty()
                     ? idGenerator.generateMsgId()
                     : chatMsg.getMsgId();
 
@@ -93,7 +94,7 @@ public class GroupChatHandler extends BaseHandler {
             // 5. 回复 ServerAck 给发送方
             String requestId = packet.getRequestId();
             ImProto.Packet ack = PacketCodec.buildServerAck(
-                    requestId != null ? requestId : "",
+                    requestId,
                     msgId,
                     packet.getSequence());
             channel.writeAndFlush(ack);
