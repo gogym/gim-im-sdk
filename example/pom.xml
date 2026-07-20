@@ -13,13 +13,13 @@
 
     <groupId>com.example</groupId>
     <artifactId>gim-im-example</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.1-SNAPSHOT</version>
     <name>GIM IM Example</name>
     <description>GIM IM SDK 完整对接使用示例</description>
 
     <properties>
         <java.version>17</java.version>
-        <gim-im-sdk.version>1.0.0-SNAPSHOT</gim-im-sdk.version>
+        <gim-im-sdk.version>1.0.1-SNAPSHOT</gim-im-sdk.version>
     </properties>
 
     <dependencies>

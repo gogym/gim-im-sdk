@@ -6,7 +6,7 @@
 
     <groupId>io.getbit</groupId>
     <artifactId>gim-im-sdk</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>GIM IM SDK</name>
@@ -43,7 +43,7 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
 
-        <gim-im-sdk.version>1.0.0-SNAPSHOT</gim-im-sdk.version>
+        <gim-im-sdk.version>1.0.1-SNAPSHOT</gim-im-sdk.version>
 
         <spring-boot.version>3.5.3</spring-boot.version>
         <netty.version>4.1.117.Final</netty.version>
