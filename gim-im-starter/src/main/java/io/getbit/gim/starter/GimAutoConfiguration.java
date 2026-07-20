@@ -2,7 +2,7 @@ package io.getbit.gim.starter;
 
 import io.getbit.gim.core.bootstrap.GimBootstrap;
 import io.getbit.gim.core.config.properties.GimProperties;
-import io.getbit.gim.core.connection.IMServerFacade;
+import io.getbit.gim.core.bootstrap.IMServerFacade;
 import io.getbit.gim.core.connection.server.NettyServer;
 import io.getbit.gim.core.spi.*;
 import org.springframework.beans.factory.ObjectProvider;

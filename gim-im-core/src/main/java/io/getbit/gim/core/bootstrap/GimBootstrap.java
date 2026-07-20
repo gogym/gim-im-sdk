@@ -3,7 +3,6 @@ package io.getbit.gim.core.bootstrap;
 import io.getbit.gim.core.config.properties.GimProperties;
 import io.getbit.gim.core.connection.auth.ConnectionAuthHandler;
 import io.getbit.gim.core.connection.channel.ChannelManager;
-import io.getbit.gim.core.connection.IMServerFacade;
 import io.getbit.gim.core.connection.server.NettyServer;
 import io.getbit.gim.core.notify.friend.FriendNotifyService;
 import io.getbit.gim.core.notify.group.GroupNotifyService;
@@ -13,6 +12,7 @@ import io.getbit.gim.core.routing.ClusterMessageRouter;
 import io.getbit.gim.core.routing.UserRouteService;
 import io.getbit.gim.core.spi.*;
 import io.netty.channel.Channel;
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,10 +22,10 @@ import java.util.List;
 
 /**
  * GimBootstrap.java
- *
+ * <p>
  * GIM SDK 手动构建入口
  * 非 Spring 环境下，通过 Builder 模式手动组装所有组件
- *
+ * <p>
  * 使用示例：
  * <pre>
  * GimProperties config = GimProperties.builder()
@@ -280,23 +280,12 @@ public class GimBootstrap {
     }
 
     /**
-     * 内部组装结果
-     */
-    private static class Assembly {
-        final IMServerFacade facade;
-        final ClusterMessageRouter clusterRouter;
-
-        Assembly(IMServerFacade facade, ClusterMessageRouter clusterRouter) {
-            this.facade = facade;
-            this.clusterRouter = clusterRouter;
-        }
-    }
-
-    /**
      * 启动上下文：包含 facade 和 nettyServer，统一管理启停
      */
     public static class StartContext {
+        @Getter
         private final IMServerFacade facade;
+        @Getter
         private final NettyServer nettyServer;
         private final ClusterMessageRouter clusterRouter;
 
@@ -304,14 +293,6 @@ public class GimBootstrap {
             this.facade = facade;
             this.nettyServer = nettyServer;
             this.clusterRouter = clusterRouter;
-        }
-
-        public IMServerFacade getFacade() {
-            return facade;
-        }
-
-        public NettyServer getNettyServer() {
-            return nettyServer;
         }
 
         /**
@@ -332,6 +313,20 @@ public class GimBootstrap {
     }
 
     // ==================== 内部占位实现 ====================
+
+    /**
+     * 内部组装结果
+     */
+    private static class Assembly {
+        private final IMServerFacade facade;
+        private final ClusterMessageRouter clusterRouter;
+
+        private Assembly(IMServerFacade facade, ClusterMessageRouter clusterRouter) {
+            this.facade = facade;
+            this.clusterRouter = clusterRouter;
+        }
+    }
+
 
     private static class NoOpRedisSubscriber implements ImRedisSubscriber {
         @Override

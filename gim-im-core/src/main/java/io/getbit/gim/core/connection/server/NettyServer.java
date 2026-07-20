@@ -2,7 +2,7 @@ package io.getbit.gim.core.connection.server;
 
 import io.getbit.gim.core.config.properties.GimProperties;
 import io.getbit.gim.core.bootstrap.GimLifecycle;
-import io.getbit.gim.core.connection.IMServerFacade;
+import io.getbit.gim.core.bootstrap.IMServerFacade;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.Channel;

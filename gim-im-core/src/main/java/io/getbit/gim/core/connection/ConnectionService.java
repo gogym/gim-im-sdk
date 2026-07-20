@@ -1,5 +1,6 @@
 package io.getbit.gim.core.connection;
 
+import io.getbit.gim.core.bootstrap.IMServerFacade;
 import io.getbit.gim.core.connection.channel.ChannelManager;
 import io.getbit.gim.core.routing.UserRouteService;
 import io.getbit.gim.protocol.codec.DeviceType;

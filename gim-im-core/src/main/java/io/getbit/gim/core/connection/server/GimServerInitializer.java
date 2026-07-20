@@ -1,6 +1,6 @@
 package io.getbit.gim.core.connection.server;
 
-import io.getbit.gim.core.connection.IMServerFacade;
+import io.getbit.gim.core.bootstrap.IMServerFacade;
 import io.getbit.gim.protocol.codec.ImProto;
 import io.getbit.gim.core.connection.auth.ConnectionAuthHandler;
 import io.netty.channel.ChannelInitializer;

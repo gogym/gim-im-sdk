@@ -1,6 +1,7 @@
-package io.getbit.gim.core.connection;
+package io.getbit.gim.core.bootstrap;
 
 import io.getbit.gim.core.config.properties.GimProperties;
+import io.getbit.gim.core.connection.ConnectionService;
 import io.getbit.gim.core.connection.channel.ChannelManager;
 import io.getbit.gim.core.connection.auth.ConnectionAuthHandler;
 import io.getbit.gim.core.connection.health.ImNodeHealthIndicator;

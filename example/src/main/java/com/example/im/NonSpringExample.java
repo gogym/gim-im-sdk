@@ -2,7 +2,7 @@ package com.example.im;
 
 import io.getbit.gim.core.bootstrap.GimBootstrap;
 import io.getbit.gim.core.config.properties.GimProperties;
-import io.getbit.gim.core.connection.IMServerFacade;
+import io.getbit.gim.core.bootstrap.IMServerFacade;
 import io.getbit.gim.core.spi.*;
 import io.getbit.gim.protocol.codec.DeviceType;
 import io.getbit.gim.protocol.codec.ImProto;
