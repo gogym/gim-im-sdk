@@ -1,52 +1,39 @@
-package io.getbit.gim.core.friend;
+package io.getbit.gim.core.notify.friend;
 
 import io.getbit.gim.core.connection.channel.ChannelManager;
+import io.getbit.gim.core.notify.BaseNotifyService;
 import io.getbit.gim.core.routing.ClusterMessageRouter;
 import io.getbit.gim.core.routing.UserRouteService;
 import io.getbit.gim.core.spi.ImEventListener;
 import io.getbit.gim.core.spi.ImFriendProvider;
-import io.getbit.gim.protocol.codec.Cmd;
-import io.getbit.gim.protocol.codec.ImProto;
 import io.getbit.gim.protocol.codec.PacketCodec;
-import io.netty.channel.Channel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.getbit.gim.protocol.codec.ImProto;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * FriendNotifyService.java
- *
+ * <p>
  * 好友通知推送服务
  * 通过 IM 长连接推送好友申请、好友状态变更、在线/离线状态等通知
- *
+ * <p>
  * 通知类型：
  * 1. FRIEND_REQUEST_NOTIFY - 好友申请通知（推送给被申请方）
  * 2. FRIEND_STATUS_NOTIFY  - 好友状态变更（上线/离线，推送给好友列表）
  *
  * @author gogym
  */
-public class FriendNotifyService {
+public class FriendNotifyService extends BaseNotifyService {
 
-    private static final Logger logger = LoggerFactory.getLogger(FriendNotifyService.class);
-
-    private final ChannelManager channelManager;
-    private final UserRouteService userRouteService;
-    private final ClusterMessageRouter clusterMessageRouter;
     private final ImFriendProvider friendProvider;
-    private final List<ImEventListener> eventListeners;
 
     public FriendNotifyService(ChannelManager channelManager,
                                UserRouteService userRouteService,
                                ClusterMessageRouter clusterMessageRouter,
                                ImFriendProvider friendProvider,
                                List<ImEventListener> eventListeners) {
-        this.channelManager = channelManager;
-        this.userRouteService = userRouteService;
-        this.clusterMessageRouter = clusterMessageRouter;
+        super(channelManager, userRouteService, clusterMessageRouter, eventListeners);
         this.friendProvider = friendProvider;
-        this.eventListeners = eventListeners;
     }
 
     // ====================== 好友申请通知 ======================
@@ -198,42 +185,6 @@ public class FriendNotifyService {
             logger.debug("离线通知已发送: userId={}, friendCount={}", userId, friendIds.size());
         } catch (Exception e) {
             logger.error("离线通知处理失败: userId={}", userId, e);
-        }
-    }
-
-    // ====================== 投递 ======================
-
-    /**
-     * 投递通知给目标用户
-     * 优先本地投递，不在线则走集群路由，路由不可达则触发离线回调
-     */
-    private void deliverToUser(String targetUserId, ImProto.Packet packet) {
-        // 先尝试本地投递
-        var deviceChannels = channelManager.getChannels(targetUserId);
-        if (!deviceChannels.isEmpty()) {
-            for (Map.Entry<?, Channel> entry : deviceChannels.entrySet()) {
-                Channel ch = entry.getValue();
-                if (ch != null && ch.isActive()) {
-                    ch.writeAndFlush(packet);
-                }
-            }
-            return;
-        }
-
-        // 本地不在线，查路由走集群
-        if (userRouteService.isRemote(targetUserId)) {
-            String targetServerId = userRouteService.getServerId(targetUserId);
-            clusterMessageRouter.routeToRemote(targetServerId, packet, targetUserId);
-        } else {
-            // 路由不可达，触发离线通知回调
-            logger.debug("通知目标用户离线且路由不可达: cmd={}, receiver={}", packet.getCmd(), targetUserId);
-            for (ImEventListener listener : eventListeners) {
-                try {
-                    listener.onOfflineNotify(packet, targetUserId);
-                } catch (Exception e) {
-                    logger.error("离线通知回调异常: receiver={}", targetUserId, e);
-                }
-            }
         }
     }
 }

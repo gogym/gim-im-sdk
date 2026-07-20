@@ -1,5 +1,6 @@
 package io.getbit.gim.core.connection.health;
 
+import io.getbit.gim.core.cache.CacheKeyBuilder;
 import io.getbit.gim.core.connection.channel.ChannelManager;
 import io.getbit.gim.core.connection.server.NettyServer;
 import io.getbit.gim.core.message.ack.MessageAckTracker;
@@ -111,7 +112,7 @@ public class ImNodeHealthIndicator {
             return false;
         }
         try {
-            String probeKey = "gim_health_probe";
+            String probeKey = CacheKeyBuilder.healthProbe();
             redisAdapter.setex(probeKey, 10, "ok");
             String result = redisAdapter.get(probeKey);
             return "ok".equals(result);

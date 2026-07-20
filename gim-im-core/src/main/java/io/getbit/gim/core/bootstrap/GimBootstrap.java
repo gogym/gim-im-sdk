@@ -5,13 +5,14 @@ import io.getbit.gim.core.connection.auth.ConnectionAuthHandler;
 import io.getbit.gim.core.connection.channel.ChannelManager;
 import io.getbit.gim.core.connection.IMServerFacade;
 import io.getbit.gim.core.connection.server.NettyServer;
-import io.getbit.gim.core.friend.FriendNotifyService;
-import io.getbit.gim.core.group.GroupNotifyService;
+import io.getbit.gim.core.notify.friend.FriendNotifyService;
+import io.getbit.gim.core.notify.group.GroupNotifyService;
 import io.getbit.gim.core.message.ack.MessageAckTracker;
 import io.getbit.gim.core.message.handler.*;
 import io.getbit.gim.core.routing.ClusterMessageRouter;
 import io.getbit.gim.core.routing.UserRouteService;
 import io.getbit.gim.core.spi.*;
+import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -177,16 +178,39 @@ public class GimBootstrap {
 
             UserRouteService userRouteService = new UserRouteService(config, redisAdapter, config.getCache());
 
-            // 使用 MessageProperties 配置 ACK 超时
+            // 读取配置
+            boolean autoRewrite = config.isAutoRewrite();
+
+            // 集群路由（先创建，供 ResendCallback 使用）
+            ClusterMessageRouter clusterRouter = new ClusterMessageRouter(
+                    config, channelManager, redisAdapter, subscriber, listeners);
+
+            // 自动重发回调：本地投递 → 集群路由
+            MessageAckTracker.ResendCallback resendCallback = (receiverId, packet) -> {
+                var channels = channelManager.getChannels(receiverId);
+                if (!channels.isEmpty()) {
+                    for (var entry : channels.entrySet()) {
+                        Channel ch = entry.getValue();
+                        if (ch != null && ch.isActive()) {
+                            ch.writeAndFlush(packet);
+                        }
+                    }
+                } else {
+                    String serverId = userRouteService.getServerId(receiverId);
+                    if (serverId != null) {
+                        clusterRouter.routeToRemote(serverId, packet, receiverId);
+                    }
+                }
+            };
+
+            // 使用 MessageProperties 配置 ACK 超时，结合 autoRewrite 配置自动重发
             MessageAckTracker messageAckTracker = new MessageAckTracker(
-                    config.getMsg().getAckTimeoutSeconds(), listeners);
+                    config.getMsg().getAckTimeoutSeconds(), listeners,
+                    autoRewrite, config.getReWriteNum(), config.getReWriteDelay(),
+                    resendCallback);
 
             ConnectionAuthHandler authHandler = new ConnectionAuthHandler(
                     tokenVerifier, channelManager, config, userRouteService);
-
-            // 集群路由
-            ClusterMessageRouter clusterRouter = new ClusterMessageRouter(
-                    config, channelManager, redisAdapter, subscriber, listeners);
 
             // ========== 组装通知服务 ==========
 
@@ -240,11 +264,10 @@ public class GimBootstrap {
             // 注入 MessageAckTracker 到健康指标，用于监控待确认消息数
             facade.getHealthIndicator().setMessageAckTracker(messageAckTracker);
 
-            logger.info("GIM SDK 组件组装完成, serverId={}, cluster={}, friend={}, group={}, ackTimeout={}s",
+            logger.info("GIM SDK 组件组装完成, serverId={}, cluster={}, friend={}, ackTimeout={}s, autoRewrite={}",
                     config.getServerId(), config.isEnableCluster(),
                     friendNotifyService != null ? "enabled" : "disabled",
-                    "enabled",
-                    config.getMsg().getAckTimeoutSeconds());
+                    config.getMsg().getAckTimeoutSeconds(), autoRewrite);
 
             return new Assembly(facade, clusterRouter);
         }

@@ -36,9 +36,6 @@ public class GimSpringProperties {
     /** 心跳间隔（秒） */
     private Integer heartBeatInterval = 30;
 
-    /** 是否开启离线消息 */
-    private boolean enableOffline = false;
-
     /** 服务器ID（集群环境标识） */
     private String serverId;
 
@@ -64,7 +61,6 @@ public class GimSpringProperties {
         props.setMsg(this.msg);
         props.setEnableHeartBeat(this.enableHeartBeat);
         props.setHeartBeatInterval(this.heartBeatInterval);
-        props.setEnableOffline(this.enableOffline);
         props.setServerId(this.serverId);
         props.setEnableCluster(this.enableCluster);
         props.setAutoRewrite(this.autoRewrite);

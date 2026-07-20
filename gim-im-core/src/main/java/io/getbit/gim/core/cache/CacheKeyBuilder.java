@@ -21,4 +21,13 @@ public class CacheKeyBuilder {
     public static String userRoute(String userId) {
         return PREFIX + "user_route:" + userId;
     }
+
+    // ====================== 健康检查 ======================
+
+    /**
+     * Redis 连接探测 key
+     */
+    public static String healthProbe() {
+        return PREFIX + "health_probe";
+    }
 }

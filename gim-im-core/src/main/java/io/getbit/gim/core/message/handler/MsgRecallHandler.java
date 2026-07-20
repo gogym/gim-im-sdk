@@ -127,24 +127,4 @@ public class MsgRecallHandler extends BaseHandler {
             }
         }
     }
-
-    /**
-     * 从 conversationId 中解析对方 userId
-     * 支持格式：minId_maxId（数字排序的会话ID）
-     * 如果 userId 是其中一方，返回另一方；否则返回 null
-     */
-    private String parseReceiverFromConversation(String conversationId, String userId) {
-        if (conversationId == null || conversationId.isEmpty()) {
-            return null;
-        }
-        // 尝试 minId_maxId 格式
-        int idx = conversationId.indexOf('_');
-        if (idx > 0 && idx < conversationId.length() - 1) {
-            String a = conversationId.substring(0, idx);
-            String b = conversationId.substring(idx + 1);
-            if (a.equals(userId)) return b;
-            if (b.equals(userId)) return a;
-        }
-        return null;
-    }
 }

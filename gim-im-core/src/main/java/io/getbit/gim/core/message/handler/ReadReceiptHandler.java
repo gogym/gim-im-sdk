@@ -78,22 +78,4 @@ public class ReadReceiptHandler extends BaseHandler {
             logger.error("已读回执处理失败, userId={}", userId, e);
         }
     }
-
-    /**
-     * 从 conversationId 中解析对方 userId
-     * 支持格式：minId_maxId（数字排序的会话ID）
-     */
-    private String parseReceiverFromConversation(String conversationId, String userId) {
-        if (conversationId == null || conversationId.isEmpty()) {
-            return null;
-        }
-        int idx = conversationId.indexOf('_');
-        if (idx > 0 && idx < conversationId.length() - 1) {
-            String a = conversationId.substring(0, idx);
-            String b = conversationId.substring(idx + 1);
-            if (a.equals(userId)) return b;
-            if (b.equals(userId)) return a;
-        }
-        return null;
-    }
 }

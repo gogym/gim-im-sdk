@@ -18,9 +18,6 @@ gim:
   enable-heart-beat: true     # 开启心跳
   heart-beat-interval: 30     # 心跳间隔（秒）
 
-  # 离线消息
-  enable-offline: false       # 是否开启离线消息
-
   # ==================== 集群配置 ====================
   # 单机模式：enable-cluster: false（默认），无需配置 server-id
   # 集群模式：enable-cluster: true，每个节点必须配置唯一的 server-id
@@ -43,7 +40,6 @@ gim:
   # 消息配置
   msg:
     ack-timeout-seconds: 10             # ACK 超时时间
-    max-retries: 3                      # 最大重发次数
 
   # WebRTC TURN 服务器配置（可选）
   webrtc:

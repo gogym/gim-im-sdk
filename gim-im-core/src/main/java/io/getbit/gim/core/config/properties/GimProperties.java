@@ -36,11 +36,6 @@ public class GimProperties {
     /** 心跳间隔（秒） */
     private Integer heartBeatInterval = 30;
 
-    // ==================== 离线消息配置 ====================
-
-    /** 是否开启离线消息 */
-    private boolean enableOffline = false;
-
     // ==================== 集群配置 ====================
 
     /**
@@ -123,11 +118,6 @@ public class GimProperties {
             return this;
         }
 
-        public Builder enableOffline(boolean enable) {
-            props.setEnableOffline(enable);
-            return this;
-        }
-
         public Builder serverId(String serverId) {
             props.setServerId(serverId);
             return this;
@@ -155,11 +145,6 @@ public class GimProperties {
 
         public Builder ackTimeoutSeconds(int seconds) {
             props.getMsg().setAckTimeoutSeconds(seconds);
-            return this;
-        }
-
-        public Builder maxRetries(int retries) {
-            props.getMsg().setMaxRetries(retries);
             return this;
         }
 

@@ -43,14 +43,19 @@ public class GimServerInitializer extends ChannelInitializer<SocketChannel> {
         this.authHandler = authHandler;
         int heartbeatInterval = facade.getConfig().getHeartBeatInterval();
         this.readerIdleSeconds = Math.max(heartbeatInterval * 3, 30);
+        this.enableHeartBeat = facade.getConfig().isEnableHeartBeat();
     }
+
+    private final boolean enableHeartBeat;
 
     @Override
     public void initChannel(SocketChannel ch) throws Exception {
         ChannelPipeline pipeline = ch.pipeline();
 
-        // 空闲检测
-        pipeline.addLast("idleState", new IdleStateHandler(readerIdleSeconds, 0, 0, TimeUnit.SECONDS));
+        // 空闲检测（仅在开启心跳时添加）
+        if (enableHeartBeat) {
+            pipeline.addLast("idleState", new IdleStateHandler(readerIdleSeconds, 0, 0, TimeUnit.SECONDS));
+        }
 
         // Protobuf 解码
         pipeline.addLast("frameDecoder", new ProtobufVarint32FrameDecoder());

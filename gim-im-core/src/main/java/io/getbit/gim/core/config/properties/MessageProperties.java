@@ -16,7 +16,4 @@ public class MessageProperties {
 
     /** ACK 超时时间（秒） */
     private int ackTimeoutSeconds = 10;
-
-    /** 最大重发次数 */
-    private int maxRetries = 3;
 }

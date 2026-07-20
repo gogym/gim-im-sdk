@@ -1,6 +1,7 @@
-package io.getbit.gim.core.group;
+package io.getbit.gim.core.notify.group;
 
 import io.getbit.gim.core.connection.channel.ChannelManager;
+import io.getbit.gim.core.notify.BaseNotifyService;
 import io.getbit.gim.core.routing.ClusterMessageRouter;
 import io.getbit.gim.core.routing.UserRouteService;
 import io.getbit.gim.core.spi.ImEventListener;
@@ -8,19 +9,15 @@ import io.getbit.gim.core.spi.ImGroupMemberProvider;
 import io.getbit.gim.protocol.codec.Cmd;
 import io.getbit.gim.protocol.codec.ImProto;
 import io.getbit.gim.protocol.codec.PacketCodec;
-import io.netty.channel.Channel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * GroupNotifyService.java
- *
+ * <p>
  * 群组通知推送服务
  * 通过 IM 长连接向群成员推送群组变更通知
- *
+ * <p>
  * 通知类型：
  * 1. GROUP_MEMBER_NOTIFY (cmd=40) - 群成员变更（加入/退出/被踢/被邀请）
  * 2. GROUP_NOTIFY        (cmd=41) - 群信息/事件变更（信息/公告/禁言/角色/转让群主）
@@ -28,26 +25,17 @@ import java.util.Map;
  *
  * @author gogym
  */
-public class GroupNotifyService {
+public class GroupNotifyService extends BaseNotifyService {
 
-    private static final Logger logger = LoggerFactory.getLogger(GroupNotifyService.class);
-
-    private final ChannelManager channelManager;
-    private final UserRouteService userRouteService;
-    private final ClusterMessageRouter clusterMessageRouter;
     private final ImGroupMemberProvider groupMemberProvider;
-    private final List<ImEventListener> eventListeners;
 
     public GroupNotifyService(ChannelManager channelManager,
                               UserRouteService userRouteService,
                               ClusterMessageRouter clusterMessageRouter,
                               ImGroupMemberProvider groupMemberProvider,
                               List<ImEventListener> eventListeners) {
-        this.channelManager = channelManager;
-        this.userRouteService = userRouteService;
-        this.clusterMessageRouter = clusterMessageRouter;
+        super(channelManager, userRouteService, clusterMessageRouter, eventListeners);
         this.groupMemberProvider = groupMemberProvider;
-        this.eventListeners = eventListeners;
     }
 
     // ====================== 群成员变更通知 ======================
@@ -160,12 +148,10 @@ public class GroupNotifyService {
 
     /**
      * 入群申请通知（推送给群主/管理员）
-     * 注意：需要 ImGroupMemberProvider 提供管理员列表，
-     * 或者使用方可直接调用 deliverToUser 推送给指定管理员
      *
-     * @param groupId     群组ID
-     * @param applicantId 申请人ID
-     * @param message     申请留言
+     * @param groupId      群组ID
+     * @param applicantId  申请人ID
+     * @param message      申请留言
      * @param adminUserIds 群主/管理员ID列表
      */
     public void notifyJoinRequest(String groupId, String applicantId, String message, List<String> adminUserIds) {
@@ -212,39 +198,6 @@ public class GroupNotifyService {
                 continue;
             }
             deliverToUser(userId, packet);
-        }
-    }
-
-    // ====================== 投递 ======================
-
-    /**
-     * 投递通知给目标用户
-     * 优先本地投递，不在线则走集群路由，路由不可达则触发离线回调
-     */
-    private void deliverToUser(String targetUserId, ImProto.Packet packet) {
-        var deviceChannels = channelManager.getChannels(targetUserId);
-        if (!deviceChannels.isEmpty()) {
-            for (Map.Entry<?, Channel> entry : deviceChannels.entrySet()) {
-                Channel ch = entry.getValue();
-                if (ch != null && ch.isActive()) {
-                    ch.writeAndFlush(packet);
-                }
-            }
-            return;
-        }
-
-        if (userRouteService.isRemote(targetUserId)) {
-            String targetServerId = userRouteService.getServerId(targetUserId);
-            clusterMessageRouter.routeToRemote(targetServerId, packet, targetUserId);
-        } else {
-            logger.debug("群通知目标用户离线: cmd={}, receiver={}", packet.getCmd(), targetUserId);
-            for (ImEventListener listener : eventListeners) {
-                try {
-                    listener.onOfflineNotify(packet, targetUserId);
-                } catch (Exception e) {
-                    logger.error("群通知离线回调异常: receiver={}", targetUserId, e);
-                }
-            }
         }
     }
 }

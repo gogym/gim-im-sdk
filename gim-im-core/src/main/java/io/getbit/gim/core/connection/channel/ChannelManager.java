@@ -6,10 +6,6 @@ import io.getbit.gim.protocol.codec.DeviceType;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import io.netty.channel.Channel;
-import io.netty.channel.group.ChannelGroup;
-import io.netty.channel.group.DefaultChannelGroup;
-import io.netty.util.concurrent.GlobalEventExecutor;
-import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,12 +55,6 @@ public class ChannelManager {
     }
 
     /**
-     * 所有连接通道的容器
-     */
-    @Getter
-    private final ChannelGroup channels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
-
-    /**
      * channelId -> ConnectionInfo（反向映射，用于断连时快速查找）
      */
     private final Cache<String, ConnectionInfo> connections;
@@ -78,8 +68,6 @@ public class ChannelManager {
 
     public Channel bind(String userId, DeviceType device, Channel channel) {
         String channelId = channel.id().asLongText();
-
-        channels.add(channel);
 
         Map<DeviceType, Channel> deviceMap = userChannels.get(userId, k -> new ConcurrentHashMap<>());
 
@@ -109,7 +97,6 @@ public class ChannelManager {
         Channel removed = deviceMap.remove(device);
         if (removed != null) {
             connections.invalidate(removed.id().asLongText());
-            channels.remove(removed);
         }
 
         if (deviceMap.isEmpty()) {

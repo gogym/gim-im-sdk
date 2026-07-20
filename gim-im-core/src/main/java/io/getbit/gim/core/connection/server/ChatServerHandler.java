@@ -48,7 +48,6 @@ public class ChatServerHandler extends SimpleChannelInboundHandler<ImProto.Packe
         Channel channel = ctx.channel();
         logger.info("[{}] 新连接建立, 等待认证 ({}s 超时)",
                 channel.id().asShortText(), ConnectionAuthHandler.AUTH_TIMEOUT);
-        facade.getChannelManager().getChannels().add(channel);
     }
 
     /**
