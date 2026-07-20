@@ -89,8 +89,7 @@ public class GimAutoConfiguration {
     // ==================== Netty 生命周期适配 ====================
 
     @Bean
-    @ConditionalOnMissingBean
     public SmartLifecycle nettyServerLifecycle(GimBootstrap.StartContext startContext) {
-        return new NettyServerLifecycleAdapter(startContext.getNettyServer(), startContext.getClusterRouter());
+        return new NettyServerLifecycleAdapter(startContext);
     }
 }

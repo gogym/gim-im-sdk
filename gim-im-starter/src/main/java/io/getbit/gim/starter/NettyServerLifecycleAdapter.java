@@ -1,42 +1,40 @@
 package io.getbit.gim.starter;
 
-import io.getbit.gim.core.connection.server.NettyServer;
-import io.getbit.gim.core.routing.ClusterMessageRouter;
+import io.getbit.gim.core.bootstrap.GimBootstrap;
 import org.springframework.context.SmartLifecycle;
 
 /**
  * NettyServerLifecycleAdapter.java
  *
- * 将 core 的 GimLifecycle（NettyServer + ClusterMessageRouter）适配为 Spring SmartLifecycle
- * 使 Netty 服务器和集群路由随 Spring 容器自动启停
+ * 将 core 的 StartContext 适配为 Spring SmartLifecycle
+ * 使 IM 服务器（Netty + 集群路由）随 Spring 容器自动启停
  *
  * @author gogym
  */
 public class NettyServerLifecycleAdapter implements SmartLifecycle {
 
-    private final NettyServer nettyServer;
-    private final ClusterMessageRouter clusterRouter;
+    private final GimBootstrap.StartContext startContext;
+    private volatile boolean running = false;
 
-    public NettyServerLifecycleAdapter(NettyServer nettyServer, ClusterMessageRouter clusterRouter) {
-        this.nettyServer = nettyServer;
-        this.clusterRouter = clusterRouter;
+    public NettyServerLifecycleAdapter(GimBootstrap.StartContext startContext) {
+        this.startContext = startContext;
     }
 
     @Override
     public void start() {
-        clusterRouter.start();
-        nettyServer.start();
+        startContext.start();
+        running = true;
     }
 
     @Override
     public void stop() {
-        nettyServer.stop();
-        clusterRouter.stop();
+        startContext.stop();
+        running = false;
     }
 
     @Override
     public boolean isRunning() {
-        return nettyServer.isRunning();
+        return running;
     }
 
     @Override
