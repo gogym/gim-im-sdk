@@ -31,10 +31,6 @@
     <modules>
         <module>gim-im-protocol</module>
         <module>gim-im-core</module>
-        <module>gim-im-broker-rocketmq</module>
-        <module>gim-im-storage</module>
-        <module>gim-im-friend</module>
-        <module>gim-im-group</module>
         <module>gim-im-webrtc</module>
         <module>gim-im-starter</module>
         <module>example</module>
@@ -86,26 +82,6 @@
             <dependency>
                 <groupId>io.getbit</groupId>
                 <artifactId>gim-im-core</artifactId>
-                <version>${gim-im-sdk.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.getbit</groupId>
-                <artifactId>gim-im-broker-rocketmq</artifactId>
-                <version>${gim-im-sdk.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.getbit</groupId>
-                <artifactId>gim-im-storage</artifactId>
-                <version>${gim-im-sdk.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.getbit</groupId>
-                <artifactId>gim-im-friend</artifactId>
-                <version>${gim-im-sdk.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.getbit</groupId>
-                <artifactId>gim-im-group</artifactId>
                 <version>${gim-im-sdk.version}</version>
             </dependency>
             <dependency>

@@ -1,6 +1,7 @@
 package io.getbit.gim.core.connection.server;
 
 import io.getbit.gim.core.config.properties.GimProperties;
+import io.getbit.gim.core.bootstrap.GimLifecycle;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.Channel;
@@ -12,7 +13,6 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.SmartLifecycle;
 
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -21,11 +21,11 @@ import java.util.concurrent.atomic.AtomicInteger;
  * NettyServer.java
  *
  * Netty服务器启动器
- * 实现 SmartLifecycle，随 Spring 容器自动启停
+ * 实现 GimLifecycle，支持手动启停
  *
  * @author gogym
  */
-public class NettyServer implements SmartLifecycle {
+public class NettyServer implements GimLifecycle {
 
     private static final Logger logger = LoggerFactory.getLogger(NettyServer.class);
 
@@ -142,16 +142,5 @@ public class NettyServer implements SmartLifecycle {
     @Override
     public boolean isRunning() {
         return running;
-    }
-
-    @Override
-    public int getPhase() {
-        // 较高 phase，确保在其他 Bean 之后启动、之前停止
-        return Integer.MAX_VALUE - 100;
-    }
-
-    @Override
-    public boolean isAutoStartup() {
-        return true;
     }
 }

@@ -11,37 +11,13 @@
 
     <artifactId>gim-im-core</artifactId>
     <name>GIM IM Core</name>
-    <description>Core IM server engine: connection management, routing, message dispatching</description>
+    <description>Core IM server engine: connection management, routing, message dispatching. Zero Spring dependency.</description>
 
     <dependencies>
         <!-- Protocol -->
         <dependency>
             <groupId>io.getbit</groupId>
             <artifactId>gim-im-protocol</artifactId>
-        </dependency>
-
-        <!-- Spring Boot (optional - for auto-config and properties binding) -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-autoconfigure</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <!-- Spring Web (optional - for ImUserContextResolver and Controller support) -->
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-web</artifactId>
-            <optional>true</optional>
         </dependency>
 
         <!-- Netty -->
@@ -77,17 +53,6 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
-        </dependency>
-        <!-- Spring Web (optional, for HeaderUserContextResolver + ApiResult) -->
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-web</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>jakarta.servlet</groupId>
-            <artifactId>jakarta.servlet-api</artifactId>
-            <optional>true</optional>
         </dependency>
     </dependencies>
 </project>

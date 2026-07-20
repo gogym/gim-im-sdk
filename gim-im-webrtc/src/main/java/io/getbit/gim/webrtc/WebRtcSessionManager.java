@@ -3,7 +3,6 @@ package io.getbit.gim.webrtc;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import io.netty.channel.Channel;
-import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.Executors;
@@ -101,6 +100,8 @@ public class WebRtcSessionManager {
         if (future != null) { timeoutTasks.invalidate(callId); future.cancel(false); }
     }
 
-    @PreDestroy
+    /**
+     * 关闭会话管理器，释放资源
+     */
     public void shutdown() { scheduler.shutdown(); sessionMap.invalidateAll(); userCallMap.invalidateAll(); timeoutTasks.invalidateAll(); }
 }

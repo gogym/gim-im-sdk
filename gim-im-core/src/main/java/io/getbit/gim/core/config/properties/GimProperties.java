@@ -2,7 +2,6 @@ package io.getbit.gim.core.config.properties;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.UUID;
 
@@ -10,13 +9,12 @@ import java.util.UUID;
  * GimProperties.java
  *
  * GIM SDK 统一配置属性类
- * 配置前缀: "gim"
+ * 纯 POJO，不依赖任何框架
  *
  * @author gogym
  */
 @Getter
 @Setter
-@ConfigurationProperties(prefix = "gim")
 public class GimProperties {
 
     // ==================== 嵌套配置类 ====================
@@ -75,4 +73,116 @@ public class GimProperties {
 
     /** 重发间隔（毫秒） */
     private Long reWriteDelay = 1000L;
+
+    // ==================== Builder ====================
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+        private final GimProperties props = new GimProperties();
+
+        public Builder nettyPort(int port) {
+            props.getNetty().setPort(port);
+            return this;
+        }
+
+        public Builder nettyBossThreads(int threads) {
+            props.getNetty().setBossThreads(threads);
+            return this;
+        }
+
+        public Builder nettyWorkerThreads(int threads) {
+            props.getNetty().setWorkerThreads(threads);
+            return this;
+        }
+
+        public Builder nettyBacklog(int backlog) {
+            props.getNetty().setBacklog(backlog);
+            return this;
+        }
+
+        public Builder cacheMaxSize(int maxSize) {
+            props.getCache().setMaxSize(maxSize);
+            return this;
+        }
+
+        public Builder cacheExpireSeconds(int seconds) {
+            props.getCache().setExpireSeconds(seconds);
+            return this;
+        }
+
+        public Builder enableHeartBeat(boolean enable) {
+            props.setEnableHeartBeat(enable);
+            return this;
+        }
+
+        public Builder heartBeatInterval(int seconds) {
+            props.setHeartBeatInterval(seconds);
+            return this;
+        }
+
+        public Builder enableOffline(boolean enable) {
+            props.setEnableOffline(enable);
+            return this;
+        }
+
+        public Builder serverId(String serverId) {
+            props.setServerId(serverId);
+            return this;
+        }
+
+        public Builder enableCluster(boolean enable) {
+            props.setEnableCluster(enable);
+            return this;
+        }
+
+        public Builder autoRewrite(boolean enable) {
+            props.setAutoRewrite(enable);
+            return this;
+        }
+
+        public Builder reWriteNum(int num) {
+            props.setReWriteNum(num);
+            return this;
+        }
+
+        public Builder reWriteDelay(long delay) {
+            props.setReWriteDelay(delay);
+            return this;
+        }
+
+        public Builder storeTopic(String topic) {
+            props.getMsg().setStoreTopic(topic);
+            return this;
+        }
+
+        public Builder offlineTopic(String topic) {
+            props.getMsg().setOfflineTopic(topic);
+            return this;
+        }
+
+        public Builder ackTimeoutSeconds(int seconds) {
+            props.getMsg().setAckTimeoutSeconds(seconds);
+            return this;
+        }
+
+        public Builder maxRetries(int retries) {
+            props.getMsg().setMaxRetries(retries);
+            return this;
+        }
+
+        /**
+         * 自定义配置（用于 Builder 未覆盖的场景）
+         */
+        public Builder customize(java.util.function.Consumer<GimProperties> customizer) {
+            customizer.accept(props);
+            return this;
+        }
+
+        public GimProperties build() {
+            return props;
+        }
+    }
 }

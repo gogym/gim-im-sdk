@@ -1,0 +1,295 @@
+package io.getbit.gim.core.bootstrap;
+
+import io.getbit.gim.core.config.properties.GimProperties;
+import io.getbit.gim.core.connection.auth.ConnectionAuthHandler;
+import io.getbit.gim.core.connection.channel.ChannelManager;
+import io.getbit.gim.core.connection.server.IMServerFacade;
+import io.getbit.gim.core.connection.server.NettyServer;
+import io.getbit.gim.core.message.ack.MessageAckTracker;
+import io.getbit.gim.core.message.handler.*;
+import io.getbit.gim.core.routing.ClusterMessageRouter;
+import io.getbit.gim.core.routing.UserRouteService;
+import io.getbit.gim.core.spi.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+/**
+ * GimBootstrap.java
+ *
+ * GIM SDK 手动构建入口
+ * 非 Spring 环境下，通过 Builder 模式手动组装所有组件
+ *
+ * 使用示例：
+ * <pre>
+ * GimProperties config = GimProperties.builder()
+ *     .nettyPort(3333)
+ *     .enableCluster(false)
+ *     .build();
+ *
+ * // 方式1：只获取门面（自行管理 NettyServer）
+ * IMServerFacade facade = GimBootstrap.builder()
+ *     .config(config)
+ *     .tokenVerifier(myTokenVerifier)
+ *     .redisAdapter(myRedisAdapter)
+ *     .idGenerator(myIdGenerator)
+ *     .build();
+ *
+ * // 方式2：获取完整启动上下文（推荐）
+ * GimBootstrap.StartContext ctx = GimBootstrap.builder()
+ *     .config(config)
+ *     .tokenVerifier(myTokenVerifier)
+ *     .redisAdapter(myRedisAdapter)
+ *     .idGenerator(myIdGenerator)
+ *     .addEventListener(myEventListener)
+ *     .buildWithServer();
+ *
+ * ctx.start();
+ * </pre>
+ *
+ * @author gogym
+ */
+public class GimBootstrap {
+
+    private static final Logger logger = LoggerFactory.getLogger(GimBootstrap.class);
+
+    private GimBootstrap() {
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+
+        private GimProperties config;
+        private ImTokenVerifier tokenVerifier;
+        private ImRedisAdapter redisAdapter;
+        private ImRedisSubscriber redisSubscriber;
+        private ImIdGenerator idGenerator;
+        private ImMessageBroker messageBroker;
+        private ImUserContextResolver userContextResolver;
+        private final List<ImEventListener> eventListeners = new ArrayList<>();
+
+        public Builder config(GimProperties config) {
+            this.config = config;
+            return this;
+        }
+
+        public Builder tokenVerifier(ImTokenVerifier tokenVerifier) {
+            this.tokenVerifier = tokenVerifier;
+            return this;
+        }
+
+        public Builder redisAdapter(ImRedisAdapter redisAdapter) {
+            this.redisAdapter = redisAdapter;
+            return this;
+        }
+
+        public Builder redisSubscriber(ImRedisSubscriber redisSubscriber) {
+            this.redisSubscriber = redisSubscriber;
+            return this;
+        }
+
+        public Builder idGenerator(ImIdGenerator idGenerator) {
+            this.idGenerator = idGenerator;
+            return this;
+        }
+
+        public Builder messageBroker(ImMessageBroker messageBroker) {
+            this.messageBroker = messageBroker;
+            return this;
+        }
+
+        public Builder userContextResolver(ImUserContextResolver userContextResolver) {
+            this.userContextResolver = userContextResolver;
+            return this;
+        }
+
+        public Builder addEventListener(ImEventListener listener) {
+            this.eventListeners.add(listener);
+            return this;
+        }
+
+        public Builder eventListeners(List<ImEventListener> listeners) {
+            this.eventListeners.clear();
+            if (listeners != null) {
+                this.eventListeners.addAll(listeners);
+            }
+            return this;
+        }
+
+        /**
+         * 构建 IMServerFacade
+         *
+         * @return IMServerFacade 统一门面
+         */
+        public IMServerFacade build() {
+            return assemble().facade;
+        }
+
+        /**
+         * 构建 IMServerFacade 并创建 NettyServer（不自动启动）
+         *
+         * @return 包含 facade、nettyServer、clusterRouter 的启动上下文
+         */
+        public StartContext buildWithServer() {
+            Assembly assembly = assemble();
+            NettyServer nettyServer = new NettyServer(config, assembly.facade);
+            return new StartContext(assembly.facade, nettyServer, assembly.clusterRouter);
+        }
+
+        // ==================== 内部组装逻辑 ====================
+
+        private Assembly assemble() {
+            // 参数校验
+            requireNonNull(config, "config");
+            requireNonNull(tokenVerifier, "tokenVerifier");
+            requireNonNull(redisAdapter, "redisAdapter");
+            requireNonNull(idGenerator, "idGenerator");
+
+            // 可选组件默认值
+            ImRedisSubscriber subscriber = redisSubscriber != null ? redisSubscriber : new NoOpRedisSubscriber();
+            ImMessageBroker broker = messageBroker != null ? messageBroker : new NoOpMessageBroker();
+
+            List<ImEventListener> listeners = eventListeners.isEmpty()
+                    ? Collections.emptyList() : Collections.unmodifiableList(eventListeners);
+
+            // ========== 组装核心组件 ==========
+
+            ChannelManager channelManager = new ChannelManager(config);
+
+            UserRouteService userRouteService = new UserRouteService(config, redisAdapter);
+
+            MessageAckTracker messageAckTracker = new MessageAckTracker(listeners);
+
+            ConnectionAuthHandler authHandler = new ConnectionAuthHandler(
+                    tokenVerifier, channelManager, config, userRouteService);
+
+            // 集群路由
+            ClusterMessageRouter clusterRouter = new ClusterMessageRouter(
+                    config, channelManager, redisAdapter, subscriber, listeners);
+
+            // 消息处理器
+            HeartbeatHandler heartbeatHandler = new HeartbeatHandler(
+                    channelManager, userRouteService, clusterRouter, listeners);
+
+            SingleChatHandler singleChatHandler = new SingleChatHandler(
+                    channelManager, userRouteService, clusterRouter, listeners, idGenerator, messageAckTracker);
+
+            GroupChatHandler groupChatHandler = new GroupChatHandler(
+                    channelManager, userRouteService, clusterRouter, listeners, idGenerator, messageAckTracker);
+
+            DeliveryAckHandler deliveryAckHandler = new DeliveryAckHandler(
+                    channelManager, userRouteService, clusterRouter, listeners, messageAckTracker);
+
+            ReadReceiptHandler readReceiptHandler = new ReadReceiptHandler(
+                    channelManager, userRouteService, clusterRouter, listeners);
+
+            MsgRecallHandler msgRecallHandler = new MsgRecallHandler(
+                    channelManager, userRouteService, clusterRouter, listeners);
+
+            RtcSignalHandler rtcSignalHandler = new RtcSignalHandler(
+                    channelManager, userRouteService, clusterRouter, listeners);
+
+            // 消息分发器
+            List<BaseHandler> handlers = List.of(
+                    heartbeatHandler, singleChatHandler, groupChatHandler,
+                    deliveryAckHandler, readReceiptHandler, msgRecallHandler, rtcSignalHandler);
+            DefaultMessageDispatcher messageDispatcher = new DefaultMessageDispatcher(handlers);
+
+            // 门面
+            IMServerFacade facade = new IMServerFacade(
+                    config, channelManager, messageDispatcher, authHandler, userRouteService, listeners);
+
+            logger.info("GIM SDK 组件组装完成, serverId={}, cluster={}",
+                    config.getServerId(), config.isEnableCluster());
+
+            return new Assembly(facade, clusterRouter);
+        }
+
+        private void requireNonNull(Object obj, String name) {
+            if (obj == null) {
+                throw new IllegalArgumentException("GimBootstrap: '" + name + "' is required");
+            }
+        }
+    }
+
+    /**
+     * 内部组装结果
+     */
+    private static class Assembly {
+        final IMServerFacade facade;
+        final ClusterMessageRouter clusterRouter;
+
+        Assembly(IMServerFacade facade, ClusterMessageRouter clusterRouter) {
+            this.facade = facade;
+            this.clusterRouter = clusterRouter;
+        }
+    }
+
+    /**
+     * 启动上下文：包含 facade 和 nettyServer，统一管理启停
+     */
+    public static class StartContext {
+        private final IMServerFacade facade;
+        private final NettyServer nettyServer;
+        private final ClusterMessageRouter clusterRouter;
+
+        public StartContext(IMServerFacade facade, NettyServer nettyServer, ClusterMessageRouter clusterRouter) {
+            this.facade = facade;
+            this.nettyServer = nettyServer;
+            this.clusterRouter = clusterRouter;
+        }
+
+        public IMServerFacade getFacade() {
+            return facade;
+        }
+
+        public NettyServer getNettyServer() {
+            return nettyServer;
+        }
+
+        /**
+         * 启动 IM 服务器（包括集群路由订阅和 Netty 监听）
+         */
+        public void start() {
+            clusterRouter.start();
+            nettyServer.start();
+        }
+
+        /**
+         * 停止 IM 服务器
+         */
+        public void stop() {
+            nettyServer.stop();
+            clusterRouter.stop();
+        }
+    }
+
+    // ==================== 内部占位实现 ====================
+
+    private static class NoOpRedisSubscriber implements ImRedisSubscriber {
+        @Override
+        public void subscribe(String channel, java.util.function.Consumer<String> callback) {
+        }
+
+        @Override
+        public void unsubscribe() {
+        }
+
+        @Override
+        public boolean isSubscribed() {
+            return false;
+        }
+    }
+
+    private static class NoOpMessageBroker implements ImMessageBroker {
+        @Override
+        public void send(String topic, String tag, String key, String body) {
+        }
+    }
+}

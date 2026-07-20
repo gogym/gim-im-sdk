@@ -12,8 +12,6 @@ import com.google.protobuf.util.JsonFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
 import java.util.List;
 
 /**
@@ -57,7 +55,6 @@ public class ClusterMessageRouter {
     /**
      * 启动：订阅本节点的 Redis channel
      */
-    @PostConstruct
     public void start() {
         String serverId = config.getServerId();
         String channel = NODE_CHANNEL_PREFIX + serverId;
@@ -78,7 +75,6 @@ public class ClusterMessageRouter {
     /**
      * 停止：取消订阅
      */
-    @PreDestroy
     public void stop() {
         redisSubscriber.unsubscribe();
         logger.info("集群消息路由已停止");

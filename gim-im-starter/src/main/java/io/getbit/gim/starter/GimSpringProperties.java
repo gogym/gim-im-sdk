@@ -1,0 +1,75 @@
+package io.getbit.gim.starter;
+
+import io.getbit.gim.core.config.properties.CacheProperties;
+import io.getbit.gim.core.config.properties.GimProperties;
+import io.getbit.gim.core.config.properties.MessageProperties;
+import io.getbit.gim.core.config.properties.NettyProperties;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+
+/**
+ * GimSpringProperties.java
+ *
+ * Spring Boot 配置属性绑定
+ * 将 application.yml 中 "gim" 前缀的配置映射到 core 的 GimProperties
+ *
+ * @author gogym
+ */
+@Getter
+@Setter
+@ConfigurationProperties(prefix = "gim")
+public class GimSpringProperties {
+
+    /** Netty服务器配置 */
+    private NettyProperties netty = new NettyProperties();
+
+    /** 本地缓存配置 */
+    private CacheProperties cache = new CacheProperties();
+
+    /** 消息发送配置 */
+    private MessageProperties msg = new MessageProperties();
+
+    /** 是否开启心跳 */
+    private boolean enableHeartBeat = true;
+
+    /** 心跳间隔（秒） */
+    private Integer heartBeatInterval = 30;
+
+    /** 是否开启离线消息 */
+    private boolean enableOffline = false;
+
+    /** 服务器ID（集群环境标识） */
+    private String serverId;
+
+    /** 是否开启集群模式 */
+    private boolean enableCluster = false;
+
+    /** 是否开启自动重发 */
+    private boolean autoRewrite = false;
+
+    /** 重发次数 */
+    private Integer reWriteNum = 3;
+
+    /** 重发间隔（毫秒） */
+    private Long reWriteDelay = 1000L;
+
+    /**
+     * 转换为 core 模块的 GimProperties
+     */
+    public GimProperties toCoreProperties() {
+        GimProperties props = new GimProperties();
+        props.setNetty(this.netty);
+        props.setCache(this.cache);
+        props.setMsg(this.msg);
+        props.setEnableHeartBeat(this.enableHeartBeat);
+        props.setHeartBeatInterval(this.heartBeatInterval);
+        props.setEnableOffline(this.enableOffline);
+        props.setServerId(this.serverId);
+        props.setEnableCluster(this.enableCluster);
+        props.setAutoRewrite(this.autoRewrite);
+        props.setReWriteNum(this.reWriteNum);
+        props.setReWriteDelay(this.reWriteDelay);
+        return props;
+    }
+}

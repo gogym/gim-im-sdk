@@ -21,9 +21,19 @@ gim:
   # 离线消息
   enable-offline: false       # 是否开启离线消息
 
-  # 集群配置
+  # ==================== 集群配置 ====================
+  # 单机模式：enable-cluster: false（默认），无需配置 server-id
+  # 集群模式：enable-cluster: true，每个节点必须配置唯一的 server-id
+  #
+  # 集群部署示例（两个节点）：
+  #   Node-1: server-id=server-01, netty.port=3333, HTTP port=8081
+  #   Node-2: server-id=server-02, netty.port=3334, HTTP port=8082
+  #
+  # 启动命令：
+  #   java -jar app.jar --gim.server-id=server-01 --gim.netty.port=3333 --gim.enable-cluster=true
+  #   java -jar app.jar --gim.server-id=server-02 --gim.netty.port=3334 --gim.enable-cluster=true
   enable-cluster: false       # 是否开启集群模式
-  # server-id: server-01      # 集群节点ID（不配置则自动生成）
+  # server-id: server-01      # 集群节点ID（不配置则自动生成 UUID）
 
   # 自动重发
   auto-rewrite: false         # 是否开启自动重发
@@ -36,6 +46,14 @@ gim:
     offline-topic: im-message-offline   # 离线消息 MQ Topic
     ack-timeout-seconds: 10             # ACK 超时时间
     max-retries: 3                      # 最大重发次数
+
+  # WebRTC TURN 服务器配置（可选）
+  webrtc:
+    turn:
+      stun-url: stun:127.0.0.1:3478
+      turn-url: turn:127.0.0.1:3478
+      shared-secret: secret             # TURN 共享密钥
+      credential-ttl: 3600              # 凭证有效期（秒）
 
 # ==================== 数据库配置 ====================
 spring:

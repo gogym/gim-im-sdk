@@ -10,38 +10,53 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>gim-im-starter</artifactId>
-    <name>GIM IM Starter</name>
-    <description>One-dependency starter that bundles all GIM IM plugins</description>
+    <name>GIM IM Spring Boot Starter</name>
+    <description>Spring Boot auto-configuration starter for GIM IM SDK. Provides out-of-the-box experience for Spring Boot users.</description>
 
     <dependencies>
+        <!-- Core modules (no Spring dependency) -->
         <dependency>
             <groupId>io.getbit</groupId>
             <artifactId>gim-im-core</artifactId>
         </dependency>
         <dependency>
             <groupId>io.getbit</groupId>
-            <artifactId>gim-im-broker-rocketmq</artifactId>
-            <version>${gim-im-sdk.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.getbit</groupId>
-            <artifactId>gim-im-storage</artifactId>
-            <version>${gim-im-sdk.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.getbit</groupId>
-            <artifactId>gim-im-friend</artifactId>
-            <version>${gim-im-sdk.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.getbit</groupId>
-            <artifactId>gim-im-group</artifactId>
-            <version>${gim-im-sdk.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.getbit</groupId>
             <artifactId>gim-im-webrtc</artifactId>
             <version>${gim-im-sdk.version}</version>
+        </dependency>
+
+        <!-- Spring Boot -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Spring Web (optional, for HeaderUserContextResolver) -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>

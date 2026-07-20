@@ -7,9 +7,18 @@ import org.springframework.stereotype.Component;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Redis 适配器实现 — 基于 Spring Data Redis
+ * Redis 适配器实现 — 基于 Spring Data Redis（Lettuce）
  * <p>
- * SDK 通过此接口操作 Redis，你可以替换为 Jedis / Redisson 等任意 Redis 客户端
+ * SDK 通过此接口操作 Redis，用于：
+ * <ul>
+ *   <li>用户路由缓存（userId → serverId）</li>
+ *   <li>连接信息存储</li>
+ *   <li>集群消息发布</li>
+ * </ul>
+ * <p>
+ * 你可以替换为 Jedis / Redisson 等任意 Redis 客户端实现。
+ *
+ * @author gogym
  */
 @Component
 public class RedisAdapterImpl implements ImRedisAdapter {
