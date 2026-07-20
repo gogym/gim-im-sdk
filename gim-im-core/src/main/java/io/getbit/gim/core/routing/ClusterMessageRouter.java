@@ -54,8 +54,14 @@ public class ClusterMessageRouter {
 
     /**
      * 启动：订阅本节点的 Redis channel
+     * 非集群模式下跳过
      */
     public void start() {
+        if (!config.isEnableCluster()) {
+            logger.info("非集群模式, 跳过集群消息路由启动");
+            return;
+        }
+
         String serverId = config.getServerId();
         String channel = NODE_CHANNEL_PREFIX + serverId;
 
@@ -74,8 +80,12 @@ public class ClusterMessageRouter {
 
     /**
      * 停止：取消订阅
+     * 非集群模式下跳过
      */
     public void stop() {
+        if (!config.isEnableCluster()) {
+            return;
+        }
         redisSubscriber.unsubscribe();
         logger.info("集群消息路由已停止");
     }

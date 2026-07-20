@@ -287,6 +287,7 @@ public class GimBootstrap {
         private final IMServerFacade facade;
         @Getter
         private final NettyServer nettyServer;
+        @Getter
         private final ClusterMessageRouter clusterRouter;
 
         public StartContext(IMServerFacade facade, NettyServer nettyServer, ClusterMessageRouter clusterRouter) {

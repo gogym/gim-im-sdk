@@ -67,7 +67,7 @@ public class GimAutoConfiguration {
         }
 
         List<ImEventListener> listeners = eventListenersProvider.getIfAvailable(Collections::emptyList);
-        if (listeners != null && !listeners.isEmpty()) {
+        if (!listeners.isEmpty()) {
             builder.eventListeners(listeners);
         }
 
@@ -90,7 +90,7 @@ public class GimAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public SmartLifecycle nettyServerLifecycle(NettyServer nettyServer) {
-        return new NettyServerLifecycleAdapter(nettyServer);
+    public SmartLifecycle nettyServerLifecycle(GimBootstrap.StartContext startContext) {
+        return new NettyServerLifecycleAdapter(startContext.getNettyServer(), startContext.getClusterRouter());
     }
 }
