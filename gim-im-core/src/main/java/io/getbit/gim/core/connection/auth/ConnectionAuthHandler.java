@@ -13,11 +13,11 @@ import org.slf4j.LoggerFactory;
 
 /**
  * ConnectionAuthHandler.java
- *
+ * <p>
  * 首包认证处理器
  * 客户端连接后必须在 AUTH_TIMEOUT 秒内发送 BIND_REQ 完成认证，否则断开连接。
  * 认证成功后将用户信息与通道绑定。
- *
+ * <p>
  * 认证流程：
  * 1. 客户端连接 → 等待 BIND_REQ
  * 2. 解析 userId + token + device

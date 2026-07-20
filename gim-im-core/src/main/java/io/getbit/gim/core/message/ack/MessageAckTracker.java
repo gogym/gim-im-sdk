@@ -134,10 +134,10 @@ public class MessageAckTracker {
     /**
      * 注册待ACK消息（带重发计数）
      *
-     * @param msgId       消息ID
-     * @param receiverId  接收者ID
-     * @param packet      发送的Packet
-     * @param retryCount  当前已重发次数
+     * @param msgId      消息ID
+     * @param receiverId 接收者ID
+     * @param packet     发送的Packet
+     * @param retryCount 当前已重发次数
      */
     private void track(String msgId, String receiverId, ImProto.Packet packet, int retryCount) {
         pendingAcks.put(msgId, new AckInfo(receiverId, System.currentTimeMillis(), packet, retryCount));
@@ -217,5 +217,6 @@ public class MessageAckTracker {
     /**
      * ACK信息记录
      */
-    private record AckInfo(String receiverId, long sentAt, ImProto.Packet packet, int retryCount) {}
+    private record AckInfo(String receiverId, long sentAt, ImProto.Packet packet, int retryCount) {
+    }
 }

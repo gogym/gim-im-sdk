@@ -7,6 +7,7 @@ import io.getbit.gim.core.message.ack.MessageAckTracker;
 import io.getbit.gim.core.routing.UserRouteService;
 import io.getbit.gim.core.spi.ImRedisAdapter;
 import io.getbit.gim.core.spi.ImRedisSubscriber;
+import lombok.Setter;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -27,10 +28,20 @@ public class ImNodeHealthIndicator {
     private final ImRedisSubscriber redisSubscriber;
     private final boolean clusterEnabled;
 
-    /** NettyServer 延迟注入（在 GimBootstrap 中创建后设置） */
+    /**
+     * NettyServer 延迟注入（在 GimBootstrap 中创建后设置）
+     * -- SETTER --
+     * 延迟注入 NettyServer（由 GimBootstrap 在创建 NettyServer 后调用）
+     */
+    @Setter
     private volatile NettyServer nettyServer;
 
-    /** MessageAckTracker 延迟注入（可选） */
+    /**
+     * MessageAckTracker 延迟注入（可选）
+     * -- SETTER --
+     * 延迟注入 MessageAckTracker（由 GimBootstrap 组装后调用）
+     */
+    @Setter
     private volatile MessageAckTracker messageAckTracker;
 
     public ImNodeHealthIndicator(ChannelManager channelManager,
@@ -43,20 +54,6 @@ public class ImNodeHealthIndicator {
         this.redisAdapter = redisAdapter;
         this.redisSubscriber = redisSubscriber;
         this.clusterEnabled = clusterEnabled;
-    }
-
-    /**
-     * 延迟注入 NettyServer（由 GimBootstrap 在创建 NettyServer 后调用）
-     */
-    public void setNettyServer(NettyServer nettyServer) {
-        this.nettyServer = nettyServer;
-    }
-
-    /**
-     * 延迟注入 MessageAckTracker（由 GimBootstrap 组装后调用）
-     */
-    public void setMessageAckTracker(MessageAckTracker messageAckTracker) {
-        this.messageAckTracker = messageAckTracker;
     }
 
     /**

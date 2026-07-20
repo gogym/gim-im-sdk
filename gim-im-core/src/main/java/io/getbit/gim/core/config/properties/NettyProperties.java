@@ -5,7 +5,7 @@ import lombok.Setter;
 
 /**
  * NettyProperties.java
- *
+ * <p>
  * Netty服务器配置
  *
  * @author gogym
@@ -14,15 +14,23 @@ import lombok.Setter;
 @Setter
 public class NettyProperties {
 
-    /** 监听端口 */
+    /**
+     * 监听端口
+     */
     private int port = 3333;
 
-    /** Boss线程数 */
+    /**
+     * Boss线程数
+     */
     private int bossThreads = 1;
 
-    /** Worker线程数（0=自动检测CPU核心数） */
+    /**
+     * Worker线程数（0=自动检测CPU核心数）
+     */
     private int workerThreads = 0;
 
-    /** 连接队列大小 */
+    /**
+     * 连接队列大小
+     */
     private int backlog = 512;
 }

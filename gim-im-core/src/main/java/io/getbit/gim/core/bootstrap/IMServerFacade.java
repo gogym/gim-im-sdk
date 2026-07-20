@@ -20,7 +20,7 @@ import java.util.List;
 
 /**
  * IMServerFacade.java
- *
+ * <p>
  * IM 服务器统一门面
  * 提供核心组件的统一获取入口
  *
@@ -30,24 +30,42 @@ public class IMServerFacade {
 
     private static final Logger logger = LoggerFactory.getLogger(IMServerFacade.class);
 
-    @Getter private final GimProperties config;
-    @Getter private final ChannelManager channelManager;
-    @Getter private final MessageDispatcher messageDispatcher;
-    @Getter private final ConnectionAuthHandler authHandler;
-    @Getter private final UserRouteService userRouteService;
-    @Getter private final List<ImEventListener> eventListeners;
+    @Getter
+    private final GimProperties config;
+    @Getter
+    private final ChannelManager channelManager;
+    @Getter
+    private final MessageDispatcher messageDispatcher;
+    @Getter
+    private final ConnectionAuthHandler authHandler;
+    @Getter
+    private final UserRouteService userRouteService;
+    @Getter
+    private final List<ImEventListener> eventListeners;
 
-    /** 好友通知推送服务（可选，未配置 ImFriendProvider 时为 null） */
-    @Getter private FriendNotifyService friendNotifyService;
+    /**
+     * 好友通知推送服务（可选，未配置 ImFriendProvider 时为 null）
+     */
+    @Getter
+    private FriendNotifyService friendNotifyService;
 
-    /** 群组通知推送服务（可选，未配置 ImGroupMemberProvider 时为 null） */
-    @Getter private GroupNotifyService groupNotifyService;
+    /**
+     * 群组通知推送服务（可选，未配置 ImGroupMemberProvider 时为 null）
+     */
+    @Getter
+    private GroupNotifyService groupNotifyService;
 
-    /** 节点健康指标 */
-    @Getter private ImNodeHealthIndicator healthIndicator;
+    /**
+     * 节点健康指标
+     */
+    @Getter
+    private ImNodeHealthIndicator healthIndicator;
 
-    /** 连接管理服务 */
-    @Getter private ConnectionService connectionService;
+    /**
+     * 连接管理服务
+     */
+    @Getter
+    private ConnectionService connectionService;
 
     public IMServerFacade(GimProperties config,
                           ChannelManager channelManager,

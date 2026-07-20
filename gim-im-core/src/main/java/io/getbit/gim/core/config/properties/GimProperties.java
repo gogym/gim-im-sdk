@@ -7,7 +7,7 @@ import java.util.UUID;
 
 /**
  * GimProperties.java
- *
+ * <p>
  * GIM SDK 统一配置属性类
  * 纯 POJO，不依赖任何框架
  *
@@ -19,21 +19,31 @@ public class GimProperties {
 
     // ==================== 嵌套配置类 ====================
 
-    /** Netty服务器配置 */
+    /**
+     * Netty服务器配置
+     */
     private NettyProperties netty = new NettyProperties();
 
-    /** 本地缓存配置 */
+    /**
+     * 本地缓存配置
+     */
     private CacheProperties cache = new CacheProperties();
 
-    /** 消息发送配置 */
+    /**
+     * 消息发送配置
+     */
     private MessageProperties msg = new MessageProperties();
 
     // ==================== 心跳配置 ====================
 
-    /** 是否开启心跳 */
+    /**
+     * 是否开启心跳
+     */
     private boolean enableHeartBeat = true;
 
-    /** 心跳间隔（秒） */
+    /**
+     * 心跳间隔（秒）
+     */
     private Integer heartBeatInterval = 30;
 
     // ==================== 集群配置 ====================
@@ -55,18 +65,26 @@ public class GimProperties {
         return serverId;
     }
 
-    /** 是否开启集群模式 */
+    /**
+     * 是否开启集群模式
+     */
     private boolean enableCluster = false;
 
     // ==================== 自动重发配置 ====================
 
-    /** 是否开启自动重发 */
+    /**
+     * 是否开启自动重发
+     */
     private boolean autoRewrite = false;
 
-    /** 重发次数 */
+    /**
+     * 重发次数
+     */
     private Integer reWriteNum = 3;
 
-    /** 重发间隔（毫秒） */
+    /**
+     * 重发间隔（毫秒）
+     */
     private Long reWriteDelay = 1000L;
 
     // ==================== Builder ====================
