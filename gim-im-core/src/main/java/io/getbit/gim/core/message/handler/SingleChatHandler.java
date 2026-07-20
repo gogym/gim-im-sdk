@@ -5,6 +5,7 @@ import io.getbit.gim.core.message.ack.MessageAckTracker;
 import io.getbit.gim.core.routing.ClusterMessageRouter;
 import io.getbit.gim.core.routing.UserRouteService;
 import io.getbit.gim.core.spi.ImEventListener;
+import io.getbit.gim.core.spi.ImFriendProvider;
 import io.getbit.gim.core.spi.ImIdGenerator;
 import io.getbit.gim.protocol.codec.Cmd;
 import io.getbit.gim.protocol.codec.ImProto;
@@ -19,10 +20,12 @@ import java.util.List;
  * 单聊消息处理器
  *
  * 处理流程：
- * 1. 解析 ChatMessage，生成 msgId
- * 2. 回复 ServerAck 给发送方
- * 3. 路由消息到接收方（本地/远程）
- * 4. 追踪 ACK（等待接收方送达确认）
+ * 1. 解析 ChatMessage
+ * 2. 好友关系校验（通过 ImFriendProvider SPI，可选）
+ * 3. 生成 msgId，回复 ServerAck 给发送方
+ * 4. 路由消息到接收方（本地/远程）
+ * 5. 追踪 ACK（等待接收方送达确认）
+ * 6. 离线 → 触发离线消息回调
  *
  * @author gogym
  */
@@ -30,16 +33,19 @@ public class SingleChatHandler extends BaseHandler {
 
     private final ImIdGenerator idGenerator;
     private final MessageAckTracker ackTracker;
+    private final ImFriendProvider friendProvider;
 
     public SingleChatHandler(ChannelManager channelManager,
                              UserRouteService userRouteService,
                              ClusterMessageRouter clusterMessageRouter,
                              List<ImEventListener> eventListeners,
                              ImIdGenerator idGenerator,
-                             MessageAckTracker ackTracker) {
+                             MessageAckTracker ackTracker,
+                             ImFriendProvider friendProvider) {
         super(channelManager, userRouteService, clusterMessageRouter, eventListeners);
         this.idGenerator = idGenerator;
         this.ackTracker = ackTracker;
+        this.friendProvider = friendProvider;
     }
 
     @Override
@@ -51,19 +57,29 @@ public class SingleChatHandler extends BaseHandler {
     public void handle(ImProto.Packet packet, Channel channel, String userId) {
         try {
             ImProto.ChatMessage chatMsg = PacketCodec.parseChatMessage(packet);
+            String receiverId = chatMsg.getReceiverId();
 
-            // 1. 生成消息ID
+            // 1. 好友关系校验（如果配置了 ImFriendProvider）
+            if (friendProvider != null && !friendProvider.isFriend(userId, receiverId)) {
+                logger.info("单聊消息被拒绝(非好友): from={}, to={}", userId, receiverId);
+                ImProto.Packet failAck = PacketCodec.buildServerAckFail(
+                        packet.getRequestId(), 403, packet.getSequence());
+                channel.writeAndFlush(failAck);
+                return;
+            }
+
+            // 2. 生成消息ID
             String msgId = (chatMsg.getMsgId() == null || chatMsg.getMsgId().isEmpty())
                     ? idGenerator.generateMsgId()
                     : chatMsg.getMsgId();
 
-            // 2. 构建带 msgId 的完整消息
+            // 3. 构建带 msgId 的完整消息
             ImProto.ChatMessage enrichedMsg = chatMsg.toBuilder()
                     .setMsgId(msgId)
                     .build();
             ImProto.Packet fwdPacket = PacketCodec.create(Cmd.SINGLE_CHAT_MSG, 0, enrichedMsg);
 
-            // 3. 回复 ServerAck 给发送方
+            // 4. 回复 ServerAck 给发送方
             String requestId = packet.getRequestId();
             ImProto.Packet ack = PacketCodec.buildServerAck(
                     requestId != null ? requestId : "",
@@ -71,12 +87,11 @@ public class SingleChatHandler extends BaseHandler {
                     packet.getSequence());
             channel.writeAndFlush(ack);
 
-            // 4. 路由到接收方
-            String receiverId = chatMsg.getReceiverId();
+            // 5. 路由到接收方
             boolean delivered = routeToUser(receiverId, fwdPacket);
 
             if (delivered) {
-                // 5. 追踪 ACK（等待接收方送达确认）
+                // 6. 追踪 ACK（等待接收方送达确认）
                 ackTracker.track(msgId, receiverId, fwdPacket);
             } else {
                 logger.debug("单聊消息接收方离线: msgId={}, receiver={}", msgId, receiverId);
@@ -88,6 +103,9 @@ public class SingleChatHandler extends BaseHandler {
 
         } catch (Exception e) {
             logger.error("单聊消息处理失败, userId={}", userId, e);
+            ImProto.Packet failAck = PacketCodec.buildServerAckFail(
+                    packet.getRequestId(), 500, packet.getSequence());
+            channel.writeAndFlush(failAck);
         }
     }
 }

@@ -57,4 +57,15 @@ public interface ImEventListener {
      * @param receiverId 接收者ID
      */
     default void onOfflineNotify(ImProto.Packet packet, String receiverId) {}
+
+    /**
+     * 消息撤回回调
+     * 使用方可实现此方法来更新 DB 中消息状态（如标记为已撤回）
+     *
+     * @param msgId         消息ID
+     * @param conversationId 会话ID
+     * @param operatorId    操作者ID
+     * @param chatType      聊天类型（1=单聊 2=群聊）
+     */
+    default void onMessageRecalled(String msgId, String conversationId, String operatorId, int chatType) {}
 }

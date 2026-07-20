@@ -5,6 +5,8 @@ import io.getbit.gim.core.connection.auth.ConnectionAuthHandler;
 import io.getbit.gim.core.connection.channel.ChannelManager;
 import io.getbit.gim.core.connection.server.IMServerFacade;
 import io.getbit.gim.core.connection.server.NettyServer;
+import io.getbit.gim.core.friend.FriendNotifyService;
+import io.getbit.gim.core.group.GroupNotifyService;
 import io.getbit.gim.core.message.ack.MessageAckTracker;
 import io.getbit.gim.core.message.handler.*;
 import io.getbit.gim.core.routing.ClusterMessageRouter;
@@ -36,6 +38,8 @@ import java.util.List;
  *     .tokenVerifier(myTokenVerifier)
  *     .redisAdapter(myRedisAdapter)
  *     .idGenerator(myIdGenerator)
+ *     .friendProvider(myFriendProvider)
+ *     .groupMemberProvider(myGroupMemberProvider)
  *     .build();
  *
  * // 方式2：获取完整启动上下文（推荐）
@@ -44,6 +48,8 @@ import java.util.List;
  *     .tokenVerifier(myTokenVerifier)
  *     .redisAdapter(myRedisAdapter)
  *     .idGenerator(myIdGenerator)
+ *     .friendProvider(myFriendProvider)
+ *     .groupMemberProvider(myGroupMemberProvider)
  *     .addEventListener(myEventListener)
  *     .buildWithServer();
  *
@@ -73,6 +79,7 @@ public class GimBootstrap {
         private ImMessageBroker messageBroker;
         private ImUserContextResolver userContextResolver;
         private ImGroupMemberProvider groupMemberProvider;
+        private ImFriendProvider friendProvider;
         private final List<ImEventListener> eventListeners = new ArrayList<>();
 
         public Builder config(GimProperties config) {
@@ -112,6 +119,15 @@ public class GimBootstrap {
 
         public Builder groupMemberProvider(ImGroupMemberProvider groupMemberProvider) {
             this.groupMemberProvider = groupMemberProvider;
+            return this;
+        }
+
+        /**
+         * 设置好友关系提供者
+         * 用于单聊好友校验、在线状态同步等
+         */
+        public Builder friendProvider(ImFriendProvider friendProvider) {
+            this.friendProvider = friendProvider;
             return this;
         }
 
@@ -180,15 +196,31 @@ public class GimBootstrap {
             ClusterMessageRouter clusterRouter = new ClusterMessageRouter(
                     config, channelManager, redisAdapter, subscriber, listeners);
 
-            // 消息处理器
+            // ========== 组装通知服务 ==========
+
+            // 好友通知服务（仅在配置了 ImFriendProvider 时启用）
+            FriendNotifyService friendNotifyService = null;
+            if (friendProvider != null) {
+                friendNotifyService = new FriendNotifyService(
+                        channelManager, userRouteService, clusterRouter, friendProvider, listeners);
+            }
+
+            // 群组通知服务（使用 ImGroupMemberProvider）
+            GroupNotifyService groupNotifyService = new GroupNotifyService(
+                    channelManager, userRouteService, clusterRouter, groupProvider, listeners);
+
+            // ========== 消息处理器 ==========
+
             HeartbeatHandler heartbeatHandler = new HeartbeatHandler(
                     channelManager, userRouteService, clusterRouter, listeners);
 
             SingleChatHandler singleChatHandler = new SingleChatHandler(
-                    channelManager, userRouteService, clusterRouter, listeners, idGenerator, messageAckTracker);
+                    channelManager, userRouteService, clusterRouter, listeners,
+                    idGenerator, messageAckTracker, friendProvider);
 
             GroupChatHandler groupChatHandler = new GroupChatHandler(
-                    channelManager, userRouteService, clusterRouter, listeners, idGenerator, messageAckTracker, groupProvider);
+                    channelManager, userRouteService, clusterRouter, listeners,
+                    idGenerator, messageAckTracker, groupProvider);
 
             DeliveryAckHandler deliveryAckHandler = new DeliveryAckHandler(
                     channelManager, userRouteService, clusterRouter, listeners, messageAckTracker);
@@ -197,7 +229,7 @@ public class GimBootstrap {
                     channelManager, userRouteService, clusterRouter, listeners);
 
             MsgRecallHandler msgRecallHandler = new MsgRecallHandler(
-                    channelManager, userRouteService, clusterRouter, listeners);
+                    channelManager, userRouteService, clusterRouter, listeners, groupProvider);
 
             RtcSignalHandler rtcSignalHandler = new RtcSignalHandler(
                     channelManager, userRouteService, clusterRouter, listeners);
@@ -210,10 +242,13 @@ public class GimBootstrap {
 
             // 门面
             IMServerFacade facade = new IMServerFacade(
-                    config, channelManager, messageDispatcher, authHandler, userRouteService, listeners);
+                    config, channelManager, messageDispatcher, authHandler, userRouteService,
+                    listeners, friendNotifyService, groupNotifyService);
 
-            logger.info("GIM SDK 组件组装完成, serverId={}, cluster={}",
-                    config.getServerId(), config.isEnableCluster());
+            logger.info("GIM SDK 组件组装完成, serverId={}, cluster={}, friend={}, group={}",
+                    config.getServerId(), config.isEnableCluster(),
+                    friendNotifyService != null ? "enabled" : "disabled",
+                    "enabled");
 
             return new Assembly(facade, clusterRouter);
         }

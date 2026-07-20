@@ -46,6 +46,7 @@ public class GimAutoConfiguration {
                                                       ObjectProvider<ImRedisSubscriber> redisSubscriberProvider,
                                                       ObjectProvider<ImMessageBroker> messageBrokerProvider,
                                                       ObjectProvider<ImGroupMemberProvider> groupMemberProviderProvider,
+                                                      ObjectProvider<ImFriendProvider> friendProviderProvider,
                                                       ObjectProvider<List<ImEventListener>> eventListenersProvider) {
         GimBootstrap.Builder builder = GimBootstrap.builder()
                 .config(config)
@@ -66,6 +67,11 @@ public class GimAutoConfiguration {
         ImGroupMemberProvider groupProvider = groupMemberProviderProvider.getIfAvailable();
         if (groupProvider != null) {
             builder.groupMemberProvider(groupProvider);
+        }
+
+        ImFriendProvider friendProvider = friendProviderProvider.getIfAvailable();
+        if (friendProvider != null) {
+            builder.friendProvider(friendProvider);
         }
 
         List<ImEventListener> listeners = eventListenersProvider.getIfAvailable(Collections::emptyList);

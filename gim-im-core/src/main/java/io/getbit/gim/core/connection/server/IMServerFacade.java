@@ -3,6 +3,8 @@ package io.getbit.gim.core.connection.server;
 import io.getbit.gim.core.config.properties.GimProperties;
 import io.getbit.gim.core.connection.channel.ChannelManager;
 import io.getbit.gim.core.connection.auth.ConnectionAuthHandler;
+import io.getbit.gim.core.friend.FriendNotifyService;
+import io.getbit.gim.core.group.GroupNotifyService;
 import io.getbit.gim.core.message.handler.MessageDispatcher;
 import io.getbit.gim.core.routing.UserRouteService;
 import io.getbit.gim.core.spi.ImEventListener;
@@ -31,21 +33,54 @@ public class IMServerFacade {
     @Getter private final UserRouteService userRouteService;
     @Getter private final List<ImEventListener> eventListeners;
 
+    /** 好友通知推送服务（可选，未配置 ImFriendProvider 时为 null） */
+    @Getter private FriendNotifyService friendNotifyService;
+
+    /** 群组通知推送服务（可选，未配置 ImGroupMemberProvider 时为 null） */
+    @Getter private GroupNotifyService groupNotifyService;
+
     public IMServerFacade(GimProperties config,
                           ChannelManager channelManager,
                           MessageDispatcher messageDispatcher,
                           ConnectionAuthHandler authHandler,
                           UserRouteService userRouteService,
                           List<ImEventListener> eventListeners) {
+        this(config, channelManager, messageDispatcher, authHandler, userRouteService, eventListeners, null, null);
+    }
+
+    public IMServerFacade(GimProperties config,
+                          ChannelManager channelManager,
+                          MessageDispatcher messageDispatcher,
+                          ConnectionAuthHandler authHandler,
+                          UserRouteService userRouteService,
+                          List<ImEventListener> eventListeners,
+                          FriendNotifyService friendNotifyService,
+                          GroupNotifyService groupNotifyService) {
         this.config = config;
         this.channelManager = channelManager;
         this.messageDispatcher = messageDispatcher;
         this.authHandler = authHandler;
         this.userRouteService = userRouteService;
         this.eventListeners = eventListeners;
+        this.friendNotifyService = friendNotifyService;
+        this.groupNotifyService = groupNotifyService;
 
         logger.info("IMServerFacade 初始化完成, serverId={}, cluster={}",
                 config.getServerId(), config.isEnableCluster());
+    }
+
+    /**
+     * 设置好友通知服务（由 GimBootstrap 组装后设置）
+     */
+    public void setFriendNotifyService(FriendNotifyService friendNotifyService) {
+        this.friendNotifyService = friendNotifyService;
+    }
+
+    /**
+     * 设置群组通知服务（由 GimBootstrap 组装后设置）
+     */
+    public void setGroupNotifyService(GroupNotifyService groupNotifyService) {
+        this.groupNotifyService = groupNotifyService;
     }
 
     /**
@@ -61,6 +96,12 @@ public class IMServerFacade {
                 }
             }
         }
+
+        // 绑定成功后，同步好友在线状态 + 通知好友上线
+        if (friendNotifyService != null) {
+            friendNotifyService.syncFriendsOnlineStatus(userId);
+            friendNotifyService.notifyUserOnline(userId);
+        }
     }
 
     /**
@@ -75,6 +116,11 @@ public class IMServerFacade {
                     logger.error("事件监听器回调异常: onUserOffline", e);
                 }
             }
+        }
+
+        // 通知好友下线
+        if (friendNotifyService != null) {
+            friendNotifyService.notifyUserOffline(userId);
         }
     }
 }
