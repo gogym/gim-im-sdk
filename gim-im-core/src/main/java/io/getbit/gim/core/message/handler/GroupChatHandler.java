@@ -90,6 +90,7 @@ public class GroupChatHandler extends BaseHandler {
             ImProto.ChatMessage enrichedMsg = chatMsg.toBuilder()
                     .setMsgId(msgId)
                     .build();
+            ImProto.Packet msgPacket = PacketCodec.create(Cmd.GROUP_CHAT_MSG, 0, enrichedMsg);
 
             // 5. 回复 ServerAck 给发送方
             String requestId = packet.getRequestId();
@@ -100,10 +101,10 @@ public class GroupChatHandler extends BaseHandler {
             channel.writeAndFlush(ack);
 
             // 6. 路由投递给在线群成员
-            routeToMembers(enrichedMsg, userId, groupId);
+            routeToMembers(enrichedMsg, msgPacket, userId, groupId);
 
-            // 7. 触发聊天消息回调（业务层持久化）
-            fireChatMessage(enrichedMsg, userId, groupId, 2);
+            // 7. 触发消息回调（业务层持久化）
+            fireReceivedMessage(msgPacket);
 
             logger.debug("群聊消息处理完成: msgId={}, from={}, group={}", msgId, userId, groupId);
 
@@ -123,7 +124,7 @@ public class GroupChatHandler extends BaseHandler {
      * 2. 为每个成员（排除发送者）路由投递
      * 3. 本地 → 直接投递 + ACK 追踪，远程 → Redis Pub/Sub，离线 → 离线消息回调
      */
-    private void routeToMembers(ImProto.ChatMessage chatMsg, String senderId, String groupId) {
+    private void routeToMembers(ImProto.ChatMessage chatMsg, ImProto.Packet msgPacket, String senderId, String groupId) {
         List<String> memberUserIds = groupMemberProvider.getGroupMemberUserIds(groupId);
         if (memberUserIds == null || memberUserIds.isEmpty()) {
             logger.warn("群消息路由: 群 {} 无活跃成员", groupId);
@@ -140,14 +141,14 @@ public class GroupChatHandler extends BaseHandler {
             }
 
             // 路由投递
-            ImProto.Packet downstreamPacket = PacketCodec.create(Cmd.GROUP_CHAT_MSG, 0, chatMsg);
+            ImProto.Packet downstreamPacket = msgPacket;
             boolean delivered = routeToUser(memberId, downstreamPacket);
 
             if (delivered) {
                 ackTracker.track(chatMsg.getMsgId(), memberId, downstreamPacket);
                 deliveredCount++;
             } else {
-                fireOfflineChat(chatMsg, memberId, "OFFLINE");
+                fireOfflineMessage(downstreamPacket, memberId, "OFFLINE");
                 offlineCount++;
             }
         }

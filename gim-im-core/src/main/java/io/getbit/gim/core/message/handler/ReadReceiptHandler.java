@@ -67,7 +67,7 @@ public class ReadReceiptHandler extends BaseHandler {
                 // 通过回调让使用方处理
                 for (ImEventListener listener : eventListeners) {
                     try {
-                        listener.onReadReceipt(userId, conversationId, lastReadMsgId);
+                        listener.onReadReceipt(packet);
                     } catch (Exception e) {
                         logger.error("已读回执回调异常: userId={}", userId, e);
                     }

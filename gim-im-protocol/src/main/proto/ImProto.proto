@@ -163,6 +163,14 @@ message RtcSignal {
   string payload    = 4;  // JSON: SDP / ICE candidate / 通话类型等数据
   string callId     = 5;  // 通话唯一ID（服务端创建会话时生成，回传给双方）
 }
+// cmd = 51: WebRTC 群聊信令消息
+message RtcGroup {
+  int32  signalType = 1;  // 信令类型（与 RtcSignal 枚举一致）
+  string fromUserId = 2;
+  string groupId   = 3;  // 目标群组ID
+  string payload    = 4;  // JSON: SDP / ICE candidate / 通话类型等数据
+  string callId     = 5;  // 通话唯一ID
+}
 // signalType 枚举（与客户端 RtcSignalType 保持一致）：
 // 1=offer, 2=answer, 3=iceCandidate,
 // 4=callRequest, 5=callAccept, 6=callReject, 7=callCancel, 8=callHangup

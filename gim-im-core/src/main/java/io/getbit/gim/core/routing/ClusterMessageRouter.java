@@ -147,7 +147,7 @@ public class ClusterMessageRouter {
                     logger.debug("集群消息本地投递成功: receiver={}, devices={}", receiverId, targetChannels.size());
                 } else {
                     logger.debug("集群消息本地投递: 用户不在线, receiver={}", receiverId);
-                    fireDeliveryFailed(chatMsg.getMsgId(), receiverId, "OFFLINE");
+                    fireDeliveryFailed(packet, receiverId, "OFFLINE");
                 }
             } catch (Exception e) {
                 logger.error("集群聊天消息本地投递失败", e);
@@ -217,7 +217,7 @@ public class ClusterMessageRouter {
                     // 用户不在线，触发离线通知回调
                     for (ImEventListener listener : eventListeners) {
                         try {
-                            listener.onOfflineNotify(packet, targetUserId);
+                            listener.onOfflineMessage(packet, targetUserId, "ROUTE_NOT_FOUND");
                         } catch (Exception e) {
                             logger.error("集群通知离线回调异常: receiver={}", targetUserId, e);
                         }
@@ -229,11 +229,11 @@ public class ClusterMessageRouter {
         }
     }
 
-    private void fireDeliveryFailed(String msgId, String receiverId, String reason) {
+    private void fireDeliveryFailed(ImProto.Packet packet, String receiverId, String reason) {
         if (eventListeners != null) {
             for (ImEventListener listener : eventListeners) {
                 try {
-                    listener.onMessageDeliveryFailed(msgId, receiverId, reason);
+                    listener.onMessageDeliveryFailed(packet, receiverId, reason);
                 } catch (Exception e) {
                     logger.error("事件监听器回调异常", e);
                 }

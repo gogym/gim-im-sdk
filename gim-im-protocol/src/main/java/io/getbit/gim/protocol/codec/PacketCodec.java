@@ -111,6 +111,10 @@ public class PacketCodec {
         return ImProto.RtcSignal.parseFrom(packet.getBody());
     }
 
+    public static ImProto.RtcGroup parseRtcGroup(ImProto.Packet packet) throws InvalidProtocolBufferException {
+        return ImProto.RtcGroup.parseFrom(packet.getBody());
+    }
+
     public static ImProto.Heartbeat parseHeartbeat(ImProto.Packet packet) throws InvalidProtocolBufferException {
         return ImProto.Heartbeat.parseFrom(packet.getBody());
     }
@@ -275,6 +279,17 @@ public class PacketCodec {
         return create(Cmd.RTC_SIGNAL, 0, builder.build());
     }
 
+    public static ImProto.Packet buildRtcGroupPacket(int signalType, String fromUserId,
+                                                      String groupId, String callId, String payload) {
+        ImProto.RtcGroup.Builder builder = ImProto.RtcGroup.newBuilder()
+                .setSignalType(signalType)
+                .setFromUserId(fromUserId != null ? fromUserId : "")
+                .setGroupId(groupId != null ? groupId : "");
+        if (callId != null) { builder.setCallId(callId); }
+        if (payload != null) { builder.setPayload(payload); }
+        return create(Cmd.RTC_GROUP_SIGNAL, 0, builder.build());
+    }
+
     public static ImProto.Packet buildKickNotify(int code, String message) {
         ImProto.KickNotify body = ImProto.KickNotify.newBuilder()
                 .setCode(code)
@@ -316,6 +331,7 @@ public class PacketCodec {
             case Cmd.GROUP_NOTIFY -> ImProto.GroupNotify.parseFrom(packet.getBody());
             case Cmd.GROUP_JOIN_REQUEST_NOTIFY -> ImProto.GroupJoinRequestNotify.parseFrom(packet.getBody());
             case Cmd.RTC_SIGNAL -> ImProto.RtcSignal.parseFrom(packet.getBody());
+            case Cmd.RTC_GROUP_SIGNAL -> ImProto.RtcGroup.parseFrom(packet.getBody());
             case Cmd.KICK_NOTIFY -> ImProto.KickNotify.parseFrom(packet.getBody());
             default -> null;
         };

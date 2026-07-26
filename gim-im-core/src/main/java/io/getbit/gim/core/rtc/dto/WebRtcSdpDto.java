@@ -1,10 +1,10 @@
-package io.getbit.gim.webrtc.dto;
+package io.getbit.gim.core.rtc.dto;
 
 import lombok.Data;
 
 /**
- * WebRTC SDP 数据传输对象
- * 用于交换 Offer 和 Answer SDP 信息
+ * WebRTC SDP DTO
+ * 用于 offer/answer 信令（signalType=1,2）
  *
  * @author gogym
  */

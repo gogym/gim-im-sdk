@@ -192,8 +192,8 @@ public class NonSpringExample {
         }
 
         @Override
-        public void onOfflineChatMessage(ImProto.ChatMessage chatMsg, String receiverId, String reason) {
-            log.info("离线消息: receiverId={}, msgId={}", receiverId, chatMsg.getMsgId());
+        public void onOfflineMessage(ImProto.Packet packet, String receiverId, String reason) {
+            log.info("离线消息: receiverId={}, cmd={}", receiverId, packet.getCmd());
             // TODO: 触发 APNs / FCM 推送
         }
     }

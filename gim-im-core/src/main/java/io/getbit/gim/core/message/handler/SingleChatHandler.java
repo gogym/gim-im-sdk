@@ -96,11 +96,11 @@ public class SingleChatHandler extends BaseHandler {
             } else {
                 logger.debug("单聊消息接收方离线: msgId={}, receiver={}", msgId, receiverId);
                 // 触发离线消息回调
-                fireOfflineChat(enrichedMsg, receiverId, "OFFLINE");
+                fireOfflineMessage(fwdPacket, receiverId, "OFFLINE");
             }
 
-            // 7. 触发聊天消息回调（业务层持久化）
-            fireChatMessage(enrichedMsg, userId, receiverId, 1);
+            // 7. 触发消息回调（业务层持久化）
+            fireReceivedMessage(fwdPacket);
 
             logger.debug("单聊消息处理完成: msgId={}, from={}, to={}", msgId, userId, receiverId);
 

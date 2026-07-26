@@ -74,7 +74,7 @@ public class MsgRecallHandler extends BaseHandler {
             // 3. 触发回调（使用方负责 DB 更新、权限校验等）
             for (ImEventListener listener : eventListeners) {
                 try {
-                    listener.onMessageRecalled(msgId, conversationId, userId, chatType);
+                    listener.onMessageRecalled(packet);
                 } catch (Exception e) {
                     logger.error("撤回回调异常: msgId={}", msgId, e);
                 }

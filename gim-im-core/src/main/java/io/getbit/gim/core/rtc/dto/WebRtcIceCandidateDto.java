@@ -1,15 +1,20 @@
-package io.getbit.gim.webrtc.dto;
+package io.getbit.gim.core.rtc.dto;
 
 import lombok.Data;
 
 /**
- * WebRTC ICE 候选者数据传输对象
- * 用于交换 ICE Candidate 信息，帮助建立 P2P 连接
+ * WebRTC ICE 候选者 DTO
+ * 用于 iceCandidate 信令（signalType=3）
  *
  * @author gogym
  */
 @Data
 public class WebRtcIceCandidateDto {
+
+    /**
+     * ICE Candidate 内容
+     */
+    private String candidate;
 
     /**
      * ICE Candidate 的 SDP Mid
@@ -20,9 +25,4 @@ public class WebRtcIceCandidateDto {
      * ICE Candidate 的 SDP MLine Index
      */
     private Integer sdpMLineIndex;
-
-    /**
-     * ICE Candidate 内容
-     */
-    private String candidate;
 }

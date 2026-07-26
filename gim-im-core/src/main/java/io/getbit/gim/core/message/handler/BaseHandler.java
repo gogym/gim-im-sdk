@@ -161,40 +161,27 @@ public abstract class BaseHandler {
     // ====================== 离线消息回调 ======================
 
     /**
-     * 触发聊天消息回调（所有消息均触发，用于业务层持久化）
+     * 触发消息回调（所有正常投递的消息均触发，用于业务层持久化）
      */
-    protected void fireChatMessage(ImProto.ChatMessage chatMsg, String senderId, String receiverId, int chatType) {
+    protected void fireReceivedMessage(ImProto.Packet packet) {
         for (ImEventListener listener : eventListeners) {
             try {
-                listener.onChatMessage(chatMsg, senderId, receiverId, chatType);
+                listener.onReceivedMessage(packet);
             } catch (Exception e) {
-                logger.error("聊天消息回调异常, receiver={}", receiverId, e);
+                logger.error("消息回调异常", e);
             }
         }
     }
 
     /**
-     * 触发离线聊天消息回调（接收方不在线时调用）
+     * 触发离线消息回调（接收方不在线时调用）
      */
-    protected void fireOfflineChat(ImProto.ChatMessage chatMsg, String receiverId, String reason) {
+    protected void fireOfflineMessage(ImProto.Packet packet, String receiverId, String reason) {
         for (ImEventListener listener : eventListeners) {
             try {
-                listener.onOfflineChatMessage(chatMsg, receiverId, reason);
+                listener.onOfflineMessage(packet, receiverId, reason);
             } catch (Exception e) {
                 logger.error("离线消息回调异常, receiver={}", receiverId, e);
-            }
-        }
-    }
-
-    /**
-     * 触发离线通知回调（接收方不在线时调用）
-     */
-    protected void fireOfflineNotify(ImProto.Packet packet, String receiverId) {
-        for (ImEventListener listener : eventListeners) {
-            try {
-                listener.onOfflineNotify(packet, receiverId);
-            } catch (Exception e) {
-                logger.error("离线通知回调异常, receiver={}", receiverId, e);
             }
         }
     }

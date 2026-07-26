@@ -17459,6 +17459,1168 @@ java.lang.String defaultValue) {
 
   }
 
+  public interface RtcGroupOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:gim.im.RtcGroup)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * 信令类型（与 RtcSignal 枚举一致）
+     * </pre>
+     *
+     * <code>int32 signalType = 1;</code>
+     * @return The signalType.
+     */
+    int getSignalType();
+
+    /**
+     * <code>string fromUserId = 2;</code>
+     * @return The fromUserId.
+     */
+    java.lang.String getFromUserId();
+    /**
+     * <code>string fromUserId = 2;</code>
+     * @return The bytes for fromUserId.
+     */
+    com.google.protobuf.ByteString
+        getFromUserIdBytes();
+
+    /**
+     * <pre>
+     * 目标群组ID
+     * </pre>
+     *
+     * <code>string groupId = 3;</code>
+     * @return The groupId.
+     */
+    java.lang.String getGroupId();
+    /**
+     * <pre>
+     * 目标群组ID
+     * </pre>
+     *
+     * <code>string groupId = 3;</code>
+     * @return The bytes for groupId.
+     */
+    com.google.protobuf.ByteString
+        getGroupIdBytes();
+
+    /**
+     * <pre>
+     * JSON: SDP / ICE candidate / 通话类型等数据
+     * </pre>
+     *
+     * <code>string payload = 4;</code>
+     * @return The payload.
+     */
+    java.lang.String getPayload();
+    /**
+     * <pre>
+     * JSON: SDP / ICE candidate / 通话类型等数据
+     * </pre>
+     *
+     * <code>string payload = 4;</code>
+     * @return The bytes for payload.
+     */
+    com.google.protobuf.ByteString
+        getPayloadBytes();
+
+    /**
+     * <pre>
+     * 通话唯一ID
+     * </pre>
+     *
+     * <code>string callId = 5;</code>
+     * @return The callId.
+     */
+    java.lang.String getCallId();
+    /**
+     * <pre>
+     * 通话唯一ID
+     * </pre>
+     *
+     * <code>string callId = 5;</code>
+     * @return The bytes for callId.
+     */
+    com.google.protobuf.ByteString
+        getCallIdBytes();
+  }
+  /**
+   * <pre>
+   * cmd = 51: WebRTC 群聊信令消息
+   * </pre>
+   *
+   * Protobuf type {@code gim.im.RtcGroup}
+   */
+  public static final class RtcGroup extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:gim.im.RtcGroup)
+      RtcGroupOrBuilder {
+  private static final long serialVersionUID = 0L;
+    static {
+      com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
+        com.google.protobuf.RuntimeVersion.RuntimeDomain.PUBLIC,
+        /* major= */ 4,
+        /* minor= */ 32,
+        /* patch= */ 0,
+        /* suffix= */ "",
+        RtcGroup.class.getName());
+    }
+    // Use RtcGroup.newBuilder() to construct.
+    private RtcGroup(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+    }
+    private RtcGroup() {
+      fromUserId_ = "";
+      groupId_ = "";
+      payload_ = "";
+      callId_ = "";
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return io.getbit.gim.protocol.codec.ImProto.internal_static_gim_im_RtcGroup_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return io.getbit.gim.protocol.codec.ImProto.internal_static_gim_im_RtcGroup_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              io.getbit.gim.protocol.codec.ImProto.RtcGroup.class, io.getbit.gim.protocol.codec.ImProto.RtcGroup.Builder.class);
+    }
+
+    public static final int SIGNALTYPE_FIELD_NUMBER = 1;
+    private int signalType_ = 0;
+    /**
+     * <pre>
+     * 信令类型（与 RtcSignal 枚举一致）
+     * </pre>
+     *
+     * <code>int32 signalType = 1;</code>
+     * @return The signalType.
+     */
+    @java.lang.Override
+    public int getSignalType() {
+      return signalType_;
+    }
+
+    public static final int FROMUSERID_FIELD_NUMBER = 2;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object fromUserId_ = "";
+    /**
+     * <code>string fromUserId = 2;</code>
+     * @return The fromUserId.
+     */
+    @java.lang.Override
+    public java.lang.String getFromUserId() {
+      java.lang.Object ref = fromUserId_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        fromUserId_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string fromUserId = 2;</code>
+     * @return The bytes for fromUserId.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getFromUserIdBytes() {
+      java.lang.Object ref = fromUserId_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        fromUserId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int GROUPID_FIELD_NUMBER = 3;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object groupId_ = "";
+    /**
+     * <pre>
+     * 目标群组ID
+     * </pre>
+     *
+     * <code>string groupId = 3;</code>
+     * @return The groupId.
+     */
+    @java.lang.Override
+    public java.lang.String getGroupId() {
+      java.lang.Object ref = groupId_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        groupId_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * 目标群组ID
+     * </pre>
+     *
+     * <code>string groupId = 3;</code>
+     * @return The bytes for groupId.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getGroupIdBytes() {
+      java.lang.Object ref = groupId_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        groupId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int PAYLOAD_FIELD_NUMBER = 4;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object payload_ = "";
+    /**
+     * <pre>
+     * JSON: SDP / ICE candidate / 通话类型等数据
+     * </pre>
+     *
+     * <code>string payload = 4;</code>
+     * @return The payload.
+     */
+    @java.lang.Override
+    public java.lang.String getPayload() {
+      java.lang.Object ref = payload_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        payload_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * JSON: SDP / ICE candidate / 通话类型等数据
+     * </pre>
+     *
+     * <code>string payload = 4;</code>
+     * @return The bytes for payload.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getPayloadBytes() {
+      java.lang.Object ref = payload_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        payload_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int CALLID_FIELD_NUMBER = 5;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object callId_ = "";
+    /**
+     * <pre>
+     * 通话唯一ID
+     * </pre>
+     *
+     * <code>string callId = 5;</code>
+     * @return The callId.
+     */
+    @java.lang.Override
+    public java.lang.String getCallId() {
+      java.lang.Object ref = callId_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        callId_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * 通话唯一ID
+     * </pre>
+     *
+     * <code>string callId = 5;</code>
+     * @return The bytes for callId.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getCallIdBytes() {
+      java.lang.Object ref = callId_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        callId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (signalType_ != 0) {
+        output.writeInt32(1, signalType_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(fromUserId_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 2, fromUserId_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(groupId_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 3, groupId_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(payload_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 4, payload_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(callId_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 5, callId_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (signalType_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(1, signalType_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(fromUserId_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(2, fromUserId_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(groupId_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(3, groupId_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(payload_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(4, payload_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(callId_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(5, callId_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof io.getbit.gim.protocol.codec.ImProto.RtcGroup)) {
+        return super.equals(obj);
+      }
+      io.getbit.gim.protocol.codec.ImProto.RtcGroup other = (io.getbit.gim.protocol.codec.ImProto.RtcGroup) obj;
+
+      if (getSignalType()
+          != other.getSignalType()) return false;
+      if (!getFromUserId()
+          .equals(other.getFromUserId())) return false;
+      if (!getGroupId()
+          .equals(other.getGroupId())) return false;
+      if (!getPayload()
+          .equals(other.getPayload())) return false;
+      if (!getCallId()
+          .equals(other.getCallId())) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + SIGNALTYPE_FIELD_NUMBER;
+      hash = (53 * hash) + getSignalType();
+      hash = (37 * hash) + FROMUSERID_FIELD_NUMBER;
+      hash = (53 * hash) + getFromUserId().hashCode();
+      hash = (37 * hash) + GROUPID_FIELD_NUMBER;
+      hash = (53 * hash) + getGroupId().hashCode();
+      hash = (37 * hash) + PAYLOAD_FIELD_NUMBER;
+      hash = (53 * hash) + getPayload().hashCode();
+      hash = (37 * hash) + CALLID_FIELD_NUMBER;
+      hash = (53 * hash) + getCallId().hashCode();
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static io.getbit.gim.protocol.codec.ImProto.RtcGroup parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static io.getbit.gim.protocol.codec.ImProto.RtcGroup parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static io.getbit.gim.protocol.codec.ImProto.RtcGroup parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static io.getbit.gim.protocol.codec.ImProto.RtcGroup parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static io.getbit.gim.protocol.codec.ImProto.RtcGroup parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static io.getbit.gim.protocol.codec.ImProto.RtcGroup parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static io.getbit.gim.protocol.codec.ImProto.RtcGroup parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static io.getbit.gim.protocol.codec.ImProto.RtcGroup parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static io.getbit.gim.protocol.codec.ImProto.RtcGroup parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static io.getbit.gim.protocol.codec.ImProto.RtcGroup parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static io.getbit.gim.protocol.codec.ImProto.RtcGroup parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static io.getbit.gim.protocol.codec.ImProto.RtcGroup parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(io.getbit.gim.protocol.codec.ImProto.RtcGroup prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * cmd = 51: WebRTC 群聊信令消息
+     * </pre>
+     *
+     * Protobuf type {@code gim.im.RtcGroup}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:gim.im.RtcGroup)
+        io.getbit.gim.protocol.codec.ImProto.RtcGroupOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return io.getbit.gim.protocol.codec.ImProto.internal_static_gim_im_RtcGroup_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return io.getbit.gim.protocol.codec.ImProto.internal_static_gim_im_RtcGroup_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                io.getbit.gim.protocol.codec.ImProto.RtcGroup.class, io.getbit.gim.protocol.codec.ImProto.RtcGroup.Builder.class);
+      }
+
+      // Construct using io.getbit.gim.protocol.codec.ImProto.RtcGroup.newBuilder()
+      private Builder() {
+
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        bitField0_ = 0;
+        signalType_ = 0;
+        fromUserId_ = "";
+        groupId_ = "";
+        payload_ = "";
+        callId_ = "";
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return io.getbit.gim.protocol.codec.ImProto.internal_static_gim_im_RtcGroup_descriptor;
+      }
+
+      @java.lang.Override
+      public io.getbit.gim.protocol.codec.ImProto.RtcGroup getDefaultInstanceForType() {
+        return io.getbit.gim.protocol.codec.ImProto.RtcGroup.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public io.getbit.gim.protocol.codec.ImProto.RtcGroup build() {
+        io.getbit.gim.protocol.codec.ImProto.RtcGroup result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public io.getbit.gim.protocol.codec.ImProto.RtcGroup buildPartial() {
+        io.getbit.gim.protocol.codec.ImProto.RtcGroup result = new io.getbit.gim.protocol.codec.ImProto.RtcGroup(this);
+        if (bitField0_ != 0) { buildPartial0(result); }
+        onBuilt();
+        return result;
+      }
+
+      private void buildPartial0(io.getbit.gim.protocol.codec.ImProto.RtcGroup result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.signalType_ = signalType_;
+        }
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.fromUserId_ = fromUserId_;
+        }
+        if (((from_bitField0_ & 0x00000004) != 0)) {
+          result.groupId_ = groupId_;
+        }
+        if (((from_bitField0_ & 0x00000008) != 0)) {
+          result.payload_ = payload_;
+        }
+        if (((from_bitField0_ & 0x00000010) != 0)) {
+          result.callId_ = callId_;
+        }
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof io.getbit.gim.protocol.codec.ImProto.RtcGroup) {
+          return mergeFrom((io.getbit.gim.protocol.codec.ImProto.RtcGroup)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(io.getbit.gim.protocol.codec.ImProto.RtcGroup other) {
+        if (other == io.getbit.gim.protocol.codec.ImProto.RtcGroup.getDefaultInstance()) return this;
+        if (other.getSignalType() != 0) {
+          setSignalType(other.getSignalType());
+        }
+        if (!other.getFromUserId().isEmpty()) {
+          fromUserId_ = other.fromUserId_;
+          bitField0_ |= 0x00000002;
+          onChanged();
+        }
+        if (!other.getGroupId().isEmpty()) {
+          groupId_ = other.groupId_;
+          bitField0_ |= 0x00000004;
+          onChanged();
+        }
+        if (!other.getPayload().isEmpty()) {
+          payload_ = other.payload_;
+          bitField0_ |= 0x00000008;
+          onChanged();
+        }
+        if (!other.getCallId().isEmpty()) {
+          callId_ = other.callId_;
+          bitField0_ |= 0x00000010;
+          onChanged();
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 8: {
+                signalType_ = input.readInt32();
+                bitField0_ |= 0x00000001;
+                break;
+              } // case 8
+              case 18: {
+                fromUserId_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000002;
+                break;
+              } // case 18
+              case 26: {
+                groupId_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000004;
+                break;
+              } // case 26
+              case 34: {
+                payload_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000008;
+                break;
+              } // case 34
+              case 42: {
+                callId_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000010;
+                break;
+              } // case 42
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+      private int bitField0_;
+
+      private int signalType_ ;
+      /**
+       * <pre>
+       * 信令类型（与 RtcSignal 枚举一致）
+       * </pre>
+       *
+       * <code>int32 signalType = 1;</code>
+       * @return The signalType.
+       */
+      @java.lang.Override
+      public int getSignalType() {
+        return signalType_;
+      }
+      /**
+       * <pre>
+       * 信令类型（与 RtcSignal 枚举一致）
+       * </pre>
+       *
+       * <code>int32 signalType = 1;</code>
+       * @param value The signalType to set.
+       * @return This builder for chaining.
+       */
+      public Builder setSignalType(int value) {
+
+        signalType_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * 信令类型（与 RtcSignal 枚举一致）
+       * </pre>
+       *
+       * <code>int32 signalType = 1;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearSignalType() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        signalType_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object fromUserId_ = "";
+      /**
+       * <code>string fromUserId = 2;</code>
+       * @return The fromUserId.
+       */
+      public java.lang.String getFromUserId() {
+        java.lang.Object ref = fromUserId_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          fromUserId_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string fromUserId = 2;</code>
+       * @return The bytes for fromUserId.
+       */
+      public com.google.protobuf.ByteString
+          getFromUserIdBytes() {
+        java.lang.Object ref = fromUserId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          fromUserId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string fromUserId = 2;</code>
+       * @param value The fromUserId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setFromUserId(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        fromUserId_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string fromUserId = 2;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearFromUserId() {
+        fromUserId_ = getDefaultInstance().getFromUserId();
+        bitField0_ = (bitField0_ & ~0x00000002);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string fromUserId = 2;</code>
+       * @param value The bytes for fromUserId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setFromUserIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        fromUserId_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object groupId_ = "";
+      /**
+       * <pre>
+       * 目标群组ID
+       * </pre>
+       *
+       * <code>string groupId = 3;</code>
+       * @return The groupId.
+       */
+      public java.lang.String getGroupId() {
+        java.lang.Object ref = groupId_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          groupId_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * 目标群组ID
+       * </pre>
+       *
+       * <code>string groupId = 3;</code>
+       * @return The bytes for groupId.
+       */
+      public com.google.protobuf.ByteString
+          getGroupIdBytes() {
+        java.lang.Object ref = groupId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          groupId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * 目标群组ID
+       * </pre>
+       *
+       * <code>string groupId = 3;</code>
+       * @param value The groupId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setGroupId(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        groupId_ = value;
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * 目标群组ID
+       * </pre>
+       *
+       * <code>string groupId = 3;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearGroupId() {
+        groupId_ = getDefaultInstance().getGroupId();
+        bitField0_ = (bitField0_ & ~0x00000004);
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * 目标群组ID
+       * </pre>
+       *
+       * <code>string groupId = 3;</code>
+       * @param value The bytes for groupId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setGroupIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        groupId_ = value;
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object payload_ = "";
+      /**
+       * <pre>
+       * JSON: SDP / ICE candidate / 通话类型等数据
+       * </pre>
+       *
+       * <code>string payload = 4;</code>
+       * @return The payload.
+       */
+      public java.lang.String getPayload() {
+        java.lang.Object ref = payload_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          payload_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * JSON: SDP / ICE candidate / 通话类型等数据
+       * </pre>
+       *
+       * <code>string payload = 4;</code>
+       * @return The bytes for payload.
+       */
+      public com.google.protobuf.ByteString
+          getPayloadBytes() {
+        java.lang.Object ref = payload_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          payload_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * JSON: SDP / ICE candidate / 通话类型等数据
+       * </pre>
+       *
+       * <code>string payload = 4;</code>
+       * @param value The payload to set.
+       * @return This builder for chaining.
+       */
+      public Builder setPayload(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        payload_ = value;
+        bitField0_ |= 0x00000008;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * JSON: SDP / ICE candidate / 通话类型等数据
+       * </pre>
+       *
+       * <code>string payload = 4;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearPayload() {
+        payload_ = getDefaultInstance().getPayload();
+        bitField0_ = (bitField0_ & ~0x00000008);
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * JSON: SDP / ICE candidate / 通话类型等数据
+       * </pre>
+       *
+       * <code>string payload = 4;</code>
+       * @param value The bytes for payload to set.
+       * @return This builder for chaining.
+       */
+      public Builder setPayloadBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        payload_ = value;
+        bitField0_ |= 0x00000008;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object callId_ = "";
+      /**
+       * <pre>
+       * 通话唯一ID
+       * </pre>
+       *
+       * <code>string callId = 5;</code>
+       * @return The callId.
+       */
+      public java.lang.String getCallId() {
+        java.lang.Object ref = callId_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          callId_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * 通话唯一ID
+       * </pre>
+       *
+       * <code>string callId = 5;</code>
+       * @return The bytes for callId.
+       */
+      public com.google.protobuf.ByteString
+          getCallIdBytes() {
+        java.lang.Object ref = callId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          callId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * 通话唯一ID
+       * </pre>
+       *
+       * <code>string callId = 5;</code>
+       * @param value The callId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setCallId(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        callId_ = value;
+        bitField0_ |= 0x00000010;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * 通话唯一ID
+       * </pre>
+       *
+       * <code>string callId = 5;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearCallId() {
+        callId_ = getDefaultInstance().getCallId();
+        bitField0_ = (bitField0_ & ~0x00000010);
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * 通话唯一ID
+       * </pre>
+       *
+       * <code>string callId = 5;</code>
+       * @param value The bytes for callId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setCallIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        callId_ = value;
+        bitField0_ |= 0x00000010;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:gim.im.RtcGroup)
+    }
+
+    // @@protoc_insertion_point(class_scope:gim.im.RtcGroup)
+    private static final io.getbit.gim.protocol.codec.ImProto.RtcGroup DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new io.getbit.gim.protocol.codec.ImProto.RtcGroup();
+    }
+
+    public static io.getbit.gim.protocol.codec.ImProto.RtcGroup getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<RtcGroup>
+        PARSER = new com.google.protobuf.AbstractParser<RtcGroup>() {
+      @java.lang.Override
+      public RtcGroup parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<RtcGroup> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<RtcGroup> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public io.getbit.gim.protocol.codec.ImProto.RtcGroup getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_gim_im_Packet_descriptor;
   private static final 
@@ -17559,6 +18721,11 @@ java.lang.String defaultValue) {
   private static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_gim_im_RtcSignal_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_gim_im_RtcGroup_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_gim_im_RtcGroup_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -17609,8 +18776,10 @@ java.lang.String defaultValue) {
       "(\005\022\017\n\007message\030\005 \001(\t\"f\n\tRtcSignal\022\022\n\nsign" +
       "alType\030\001 \001(\005\022\022\n\nfromUserId\030\002 \001(\t\022\020\n\010toUs" +
       "erId\030\003 \001(\t\022\017\n\007payload\030\004 \001(\t\022\016\n\006callId\030\005 " +
-      "\001(\tB)\n\034io.getbit.gim.protocol.codecB\007ImP" +
-      "rotoP\000b\006proto3"
+      "\001(\t\"d\n\010RtcGroup\022\022\n\nsignalType\030\001 \001(\005\022\022\n\nf" +
+      "romUserId\030\002 \001(\t\022\017\n\007groupId\030\003 \001(\t\022\017\n\007payl" +
+      "oad\030\004 \001(\t\022\016\n\006callId\030\005 \001(\tB)\n\034io.getbit.g" +
+      "im.protocol.codecB\007ImProtoP\000b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -17736,6 +18905,12 @@ java.lang.String defaultValue) {
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_gim_im_RtcSignal_descriptor,
         new java.lang.String[] { "SignalType", "FromUserId", "ToUserId", "Payload", "CallId", });
+    internal_static_gim_im_RtcGroup_descriptor =
+      getDescriptor().getMessageTypes().get(19);
+    internal_static_gim_im_RtcGroup_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_gim_im_RtcGroup_descriptor,
+        new java.lang.String[] { "SignalType", "FromUserId", "GroupId", "Payload", "CallId", });
     descriptor.resolveAllFeaturesImmutable();
   }
 

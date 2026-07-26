@@ -33,60 +33,47 @@ public interface ImEventListener {
     /**
      * 消息投递失败（接收者离线且无路由时触发）
      *
-     * @param msgId      消息ID
+     * @param packet     投递失败的消息包
      * @param receiverId 接收者ID
      * @param reason     失败原因
      */
-    default void onMessageDeliveryFailed(String msgId, String receiverId, String reason) {}
+    default void onMessageDeliveryFailed(ImProto.Packet packet, String receiverId, String reason) {}
 
     /**
-     * 离线聊天消息回调（接收方不在线时触发）
+     * 离线消息回调（接收方不在线时触发）
      * 使用方可实现此方法来触发离线推送（APNs/FCM）或入库待拉取
+     * 通过 packet.getCmd() 可区分消息类型（聊天消息、好友通知、群通知、信令等）
      *
-     * @param chatMsg    聊天消息
+     * @param packet     离线消息包（统一信封，按 cmd 解析 body）
      * @param receiverId 接收者ID
-     * @param reason     离线原因（OFFLINE / ROUTE_NOT_FOUND）
+     * @param reason     离线原因（OFFLINE / ROUTE_NOT_FOUND / ACK_TIMEOUT）
      */
-    default void onOfflineChatMessage(ImProto.ChatMessage chatMsg, String receiverId, String reason) {}
-
-    /**
-     * 离线通知消息回调（接收方不在线时触发）
-     * 使用方可实现此方法来触发离线推送（好友申请、群通知等）
-     *
-     * @param packet     通知包
-     * @param receiverId 接收者ID
-     */
-    default void onOfflineNotify(ImProto.Packet packet, String receiverId) {}
+    default void onOfflineMessage(ImProto.Packet packet, String receiverId, String reason) {}
 
     /**
      * 消息撤回回调
      * 使用方可实现此方法来更新 DB 中消息状态（如标记为已撤回）
+     * 通过 packet body 可解析 MsgRecallRequest 获取 msgId、conversationId 等
      *
-     * @param msgId         消息ID
-     * @param conversationId 会话ID
-     * @param operatorId    操作者ID
-     * @param chatType      聊天类型（1=单聊 2=群聊）
+     * @param packet 撤回请求包（cmd=MSG_RECALL_REQ，body 为 MsgRecallRequest）
      */
-    default void onMessageRecalled(String msgId, String conversationId, String operatorId, int chatType) {}
+    default void onMessageRecalled(ImProto.Packet packet) {}
 
     /**
      * 已读回执回调
      * 当无法自动路由已读回执时（如群聊场景），通过此回调通知使用方处理
+     * 通过 packet body 可解析 ReadReceipt 获取 conversationId、lastReadMsgId 等
      *
-     * @param readerId       已读用户ID
-     * @param conversationId 会话ID
-     * @param lastReadMsgId  最后已读的消息ID
+     * @param packet 已读回执包（cmd=READ_RECEIPT，body 为 ReadReceipt）
      */
-    default void onReadReceipt(String readerId, String conversationId, String lastReadMsgId) {}
+    default void onReadReceipt(ImProto.Packet packet) {}
 
     /**
-     * 聊天消息回调（所有聊天消息均触发，无论接收方是否在线）
+     * 消息回调（所有正常投递的消息均触发，无论接收方是否在线）
      * 使用方可实现此方法进行消息持久化（写入 DB / 发送到 MQ 等）
+     * 通过 packet.getCmd() 可区分消息类型（聊天消息、好友通知、群通知、信令等）
      *
-     * @param chatMsg   聊天消息
-     * @param senderId  发送者ID
-     * @param receiverId 接收方ID（单聊为用户ID，群聊为群组ID）
-     * @param chatType  聊天类型（1=单聊 2=群聊）
+     * @param packet 消息包（统一信封，按 cmd 解析 body）
      */
-    default void onChatMessage(ImProto.ChatMessage chatMsg, String senderId, String receiverId, int chatType) {}
+    default void onReceivedMessage(ImProto.Packet packet) {}
 }

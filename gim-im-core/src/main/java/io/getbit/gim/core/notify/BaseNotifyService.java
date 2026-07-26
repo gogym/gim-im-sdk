@@ -72,7 +72,7 @@ public abstract class BaseNotifyService {
         logger.debug("通知目标用户离线且路由不可达: cmd={}, receiver={}", packet.getCmd(), targetUserId);
         for (ImEventListener listener : eventListeners) {
             try {
-                listener.onOfflineNotify(packet, targetUserId);
+                listener.onOfflineMessage(packet, targetUserId, "OFFLINE");
             } catch (Exception e) {
                 logger.error("离线通知回调异常: receiver={}", targetUserId, e);
             }

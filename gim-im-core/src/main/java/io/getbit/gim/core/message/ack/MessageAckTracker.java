@@ -2,7 +2,6 @@ package io.getbit.gim.core.message.ack;
 
 import io.getbit.gim.core.spi.ImEventListener;
 import io.getbit.gim.protocol.codec.ImProto;
-import io.getbit.gim.protocol.codec.PacketCodec;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import org.slf4j.Logger;
@@ -199,18 +198,12 @@ public class MessageAckTracker {
      * ACK超时触发离线回调
      */
     private void fireAckTimeout(String msgId, AckInfo info) {
-        try {
-            ImProto.ChatMessage chatMsg = PacketCodec.parseChatMessage(info.packet);
-            for (ImEventListener listener : eventListeners) {
-                try {
-                    listener.onOfflineChatMessage(chatMsg, info.receiverId, "ACK_TIMEOUT");
-                } catch (Exception e) {
-                    logger.error("ACK超时离线回调异常, msgId={}", msgId, e);
-                }
+        for (ImEventListener listener : eventListeners) {
+            try {
+                listener.onOfflineMessage(info.packet, info.receiverId, "ACK_TIMEOUT");
+            } catch (Exception e) {
+                logger.error("ACK超时离线回调异常, msgId={}", msgId, e);
             }
-        } catch (Exception e) {
-            // Packet 可能不是聊天消息（如信令等），忽略解析异常
-            logger.debug("ACK超时回调: 非聊天消息类型, msgId={}", msgId);
         }
     }
 

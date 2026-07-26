@@ -277,15 +277,15 @@ public class ClusterExample {
         }
 
         @Override
-        public void onOfflineChatMessage(ImProto.ChatMessage chatMsg, String receiverId, String reason) {
-            log.info("[集群] 离线消息: receiverId={}, msgId={}, reason={}",
-                    receiverId, chatMsg.getMsgId(), reason);
+        public void onOfflineMessage(ImProto.Packet packet, String receiverId, String reason) {
+            log.info("[集群] 离线消息: receiverId={}, cmd={}, reason={}",
+                    receiverId, packet.getCmd(), reason);
             // TODO: 触发 APNs / FCM 推送通知
         }
 
         @Override
-        public void onMessageDeliveryFailed(String msgId, String receiverId, String reason) {
-            log.info("[集群] 消息投递失败: msgId={}, receiverId={}, reason={}", msgId, receiverId, reason);
+        public void onMessageDeliveryFailed(ImProto.Packet packet, String receiverId, String reason) {
+            log.info("[集群] 消息投递失败: receiverId={}, cmd={}, reason={}", receiverId, packet.getCmd(), reason);
         }
     }
 }

@@ -250,10 +250,14 @@ public class GimBootstrap {
             RtcSignalHandler rtcSignalHandler = new RtcSignalHandler(
                     channelManager, userRouteService, clusterRouter, listeners);
 
+            RtcGroupHandler rtcGroupHandler = new RtcGroupHandler(
+                    channelManager, userRouteService, clusterRouter, listeners, groupProvider);
+
             // 消息分发器
             List<BaseHandler> handlers = List.of(
                     heartbeatHandler, singleChatHandler, groupChatHandler,
-                    deliveryAckHandler, readReceiptHandler, msgRecallHandler, rtcSignalHandler);
+                    deliveryAckHandler, readReceiptHandler, msgRecallHandler,
+                    rtcSignalHandler, rtcGroupHandler);
             DefaultMessageDispatcher messageDispatcher = new DefaultMessageDispatcher(handlers);
 
             // 门面（内置 ImNodeHealthIndicator，传入 Redis 组件用于健康检查）
