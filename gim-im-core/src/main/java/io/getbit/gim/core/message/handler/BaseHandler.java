@@ -32,14 +32,12 @@ public abstract class BaseHandler {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-    protected final IMServerFacade facade;
     protected final ChannelManager channelManager;
     protected final UserRouteService userRouteService;
     protected final ClusterMessageRouter clusterMessageRouter;
     protected final List<ImEventListener> eventListeners;
 
     protected BaseHandler(IMServerFacade facade) {
-        this.facade = facade;
         this.channelManager = facade.getChannelManager();
         this.userRouteService = facade.getUserRouteService();
         this.clusterMessageRouter = facade.getClusterRouter();
