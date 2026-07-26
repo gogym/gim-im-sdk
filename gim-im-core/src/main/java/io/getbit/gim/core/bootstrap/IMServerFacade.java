@@ -49,31 +49,31 @@ public class IMServerFacade {
      * 好友通知推送服务（可选，未配置 ImFriendProvider 时为 null）
      */
     @Getter
-    private FriendNotifyService friendNotifyService;
+    private final FriendNotifyService friendNotifyService;
 
     /**
      * 群组通知推送服务（可选，未配置 ImGroupMemberProvider 时为 null）
      */
     @Getter
-    private GroupNotifyService groupNotifyService;
+    private final GroupNotifyService groupNotifyService;
 
     /**
      * 节点健康指标
      */
     @Getter
-    private ImNodeHealthIndicator healthIndicator;
+    private final ImNodeHealthIndicator healthIndicator;
 
     /**
      * 连接管理服务
      */
     @Getter
-    private ConnectionService connectionService;
+    private final ConnectionService connectionService;
 
     /**
      * 集群消息路由
      */
     @Getter
-    private ClusterMessageRouter clusterRouter;
+    private final ClusterMessageRouter clusterRouter;
 
     private IMServerFacade(Builder builder) {
         this.config = builder.config;
@@ -87,6 +87,7 @@ public class IMServerFacade {
                 channelManager, userRouteService, builder.redisAdapter,
                 builder.redisSubscriber, config.isEnableCluster());
         this.connectionService = new ConnectionService(channelManager, userRouteService, this);
+        this.clusterRouter = builder.clusterRouter;
 
         logger.info("IMServerFacade 初始化完成, serverId={}, cluster={}",
                 config.getServerId(), config.isEnableCluster());
@@ -105,6 +106,7 @@ public class IMServerFacade {
         private GroupNotifyService groupNotifyService;
         private ImRedisAdapter redisAdapter;
         private ImRedisSubscriber redisSubscriber;
+        private ClusterMessageRouter clusterRouter;
 
         public Builder config(GimProperties config) {
             this.config = config;
@@ -151,6 +153,11 @@ public class IMServerFacade {
             return this;
         }
 
+        public Builder clusterRouter(ClusterMessageRouter clusterRouter) {
+            this.clusterRouter = clusterRouter;
+            return this;
+        }
+
         public IMServerFacade build() {
             return new IMServerFacade(this);
         }
@@ -161,13 +168,6 @@ public class IMServerFacade {
      */
     void setMessageDispatcher(MessageDispatcher messageDispatcher) {
         this.messageDispatcher = messageDispatcher;
-    }
-
-    /**
-     * 设置集群消息路由（由 GimBootstrap 内部组装后注入）
-     */
-    void setClusterRouter(ClusterMessageRouter clusterRouter) {
-        this.clusterRouter = clusterRouter;
     }
 
     /**

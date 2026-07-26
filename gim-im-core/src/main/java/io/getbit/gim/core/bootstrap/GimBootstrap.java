@@ -237,10 +237,8 @@ public class GimBootstrap {
                     .groupNotifyService(groupNotifyService)
                     .redisAdapter(redisAdapter)
                     .redisSubscriber(subscriber)
+                    .clusterRouter(clusterRouter)
                     .build();
-
-            // 注入 ClusterMessageRouter 到门面，供 Handler 构造时使用
-            facade.setClusterRouter(clusterRouter);
 
             // ========== 消息处理器（通过 facade 注入依赖） ==========
 
