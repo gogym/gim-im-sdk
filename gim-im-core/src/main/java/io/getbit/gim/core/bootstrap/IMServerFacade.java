@@ -7,6 +7,8 @@ import io.getbit.gim.core.connection.auth.ConnectionAuthHandler;
 import io.getbit.gim.core.connection.health.ImNodeHealthIndicator;
 import io.getbit.gim.core.notify.friend.FriendNotifyService;
 import io.getbit.gim.core.notify.group.GroupNotifyService;
+import io.getbit.gim.core.message.handler.BaseHandler;
+import io.getbit.gim.core.message.handler.DefaultMessageDispatcher;
 import io.getbit.gim.core.message.handler.MessageDispatcher;
 import io.getbit.gim.core.routing.ClusterMessageRouter;
 import io.getbit.gim.core.routing.UserRouteService;
@@ -19,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * IMServerFacade.java
@@ -37,7 +40,7 @@ public class IMServerFacade {
     @Getter
     private final ChannelManager channelManager;
     @Getter
-    private MessageDispatcher messageDispatcher;
+    private final MessageDispatcher messageDispatcher;
     @Getter
     private final ConnectionAuthHandler authHandler;
     @Getter
@@ -89,6 +92,24 @@ public class IMServerFacade {
         this.connectionService = new ConnectionService(channelManager, userRouteService, this);
         this.clusterRouter = builder.clusterRouter;
 
+        // 通过工厂创建 Handlers 和 Dispatcher（解决循环依赖）
+        if (builder.handlerFactory != null) {
+            List<BaseHandler> handlers = builder.handlerFactory.apply(this);
+            this.messageDispatcher = new DefaultMessageDispatcher(handlers);
+        } else {
+            this.messageDispatcher = new DefaultMessageDispatcher(Collections.emptyList());
+        }
+
+        // 外部模块注册额外 Handler（如 RTC 信令处理器）
+        if (builder.postBuildHook != null) {
+            List<BaseHandler> extraHandlers = builder.postBuildHook.apply(this);
+            if (extraHandlers != null) {
+                for (BaseHandler h : extraHandlers) {
+                    ((DefaultMessageDispatcher) messageDispatcher).registerHandler(h);
+                }
+            }
+        }
+
         logger.info("IMServerFacade 初始化完成, serverId={}, cluster={}",
                 config.getServerId(), config.isEnableCluster());
     }
@@ -107,6 +128,8 @@ public class IMServerFacade {
         private ImRedisAdapter redisAdapter;
         private ImRedisSubscriber redisSubscriber;
         private ClusterMessageRouter clusterRouter;
+        private Function<IMServerFacade, List<BaseHandler>> handlerFactory;
+        private Function<IMServerFacade, List<BaseHandler>> postBuildHook;
 
         public Builder config(GimProperties config) {
             this.config = config;
@@ -158,16 +181,28 @@ public class IMServerFacade {
             return this;
         }
 
+        /**
+         * 设置消息处理器工厂
+         * 工厂接收 IMServerFacade 参数，返回 Handler 列表
+         * 用于解决 Handler → Facade → Dispatcher 的循环依赖
+         */
+        public Builder handlerFactory(Function<IMServerFacade, List<BaseHandler>> handlerFactory) {
+            this.handlerFactory = handlerFactory;
+            return this;
+        }
+
+        /**
+         * 设置后置 Handler 注册钩子
+         * 用于外部模块（如 WebRTC）在 Dispatcher 创建后注册额外 Handler
+         */
+        public Builder postBuildHook(Function<IMServerFacade, List<BaseHandler>> postBuildHook) {
+            this.postBuildHook = postBuildHook;
+            return this;
+        }
+
         public IMServerFacade build() {
             return new IMServerFacade(this);
         }
-    }
-
-    /**
-     * 设置消息分发器（由 GimBootstrap 组装后注入）
-     */
-    void setMessageDispatcher(MessageDispatcher messageDispatcher) {
-        this.messageDispatcher = messageDispatcher;
     }
 
     /**

@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * GimBootstrap.java
@@ -80,6 +81,7 @@ public class GimBootstrap {
         private ImGroupMemberProvider groupMemberProvider;
         private ImFriendProvider friendProvider;
         private final List<ImEventListener> eventListeners = new ArrayList<>();
+        private Function<IMServerFacade, List<BaseHandler>> postBuildHook;
 
         public Builder config(GimProperties config) {
             this.config = config;
@@ -130,6 +132,15 @@ public class GimBootstrap {
             if (listeners != null) {
                 this.eventListeners.addAll(listeners);
             }
+            return this;
+        }
+
+        /**
+         * 设置后置 Handler 注册钩子
+         * 用于外部模块（如 WebRTC）在 Dispatcher 创建后注册额外 Handler
+         */
+        public Builder postBuildHook(Function<IMServerFacade, List<BaseHandler>> postBuildHook) {
+            this.postBuildHook = postBuildHook;
             return this;
         }
 
@@ -225,7 +236,7 @@ public class GimBootstrap {
             GroupNotifyService groupNotifyService = new GroupNotifyService(
                     channelManager, userRouteService, clusterRouter, groupProvider, listeners);
 
-            // ========== 先创建门面（Dispatcher 后置注入） ==========
+            // ========== 创建门面（通过工厂创建 Handlers 和 Dispatcher） ==========
 
             IMServerFacade facade = new IMServerFacade.Builder()
                     .config(config)
@@ -238,33 +249,16 @@ public class GimBootstrap {
                     .redisAdapter(redisAdapter)
                     .redisSubscriber(subscriber)
                     .clusterRouter(clusterRouter)
+                    .handlerFactory(f -> List.of(
+                            new HeartbeatHandler(f),
+                            new SingleChatHandler(f, idGenerator, messageAckTracker, friendProvider),
+                            new GroupChatHandler(f, idGenerator, messageAckTracker, groupProvider),
+                            new DeliveryAckHandler(f, messageAckTracker),
+                            new ReadReceiptHandler(f),
+                            new MsgRecallHandler(f, groupProvider)
+                    ))
+                    .postBuildHook(postBuildHook)
                     .build();
-
-            // ========== 消息处理器（通过 facade 注入依赖） ==========
-
-            HeartbeatHandler heartbeatHandler = new HeartbeatHandler(facade);
-
-            SingleChatHandler singleChatHandler = new SingleChatHandler(
-                    facade, idGenerator, messageAckTracker, friendProvider);
-
-            GroupChatHandler groupChatHandler = new GroupChatHandler(
-                    facade, idGenerator, messageAckTracker, groupProvider);
-
-            DeliveryAckHandler deliveryAckHandler = new DeliveryAckHandler(
-                    facade, messageAckTracker);
-
-            ReadReceiptHandler readReceiptHandler = new ReadReceiptHandler(facade);
-
-            MsgRecallHandler msgRecallHandler = new MsgRecallHandler(facade, groupProvider);
-
-            // 消息分发器（RTC Handler 由外部模块通过 registerHandler 动态注册）
-            List<BaseHandler> handlers = List.of(
-                    heartbeatHandler, singleChatHandler, groupChatHandler,
-                    deliveryAckHandler, readReceiptHandler, msgRecallHandler);
-            DefaultMessageDispatcher messageDispatcher = new DefaultMessageDispatcher(handlers);
-
-            // 注入 Dispatcher 到门面
-            facade.setMessageDispatcher(messageDispatcher);
 
             // 注入 MessageAckTracker 到健康指标，用于监控待确认消息数
             facade.getHealthIndicator().setMessageAckTracker(messageAckTracker);

@@ -4,7 +4,10 @@ import io.getbit.gim.core.bootstrap.GimBootstrap;
 import io.getbit.gim.core.config.properties.GimProperties;
 import io.getbit.gim.core.bootstrap.IMServerFacade;
 import io.getbit.gim.core.connection.server.NettyServer;
+import io.getbit.gim.core.message.handler.BaseHandler;
 import io.getbit.gim.core.spi.*;
+import io.getbit.gim.webrtc.handler.RtcGroupHandler;
+import io.getbit.gim.webrtc.handler.RtcSignalHandler;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -12,6 +15,7 @@ import org.springframework.context.SmartLifecycle;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -70,6 +74,17 @@ public class GimAutoConfiguration {
         if (!listeners.isEmpty()) {
             builder.eventListeners(listeners);
         }
+
+        // RTC Handler 后置注册钩子
+        ImGroupMemberProvider rtcGroupProvider = groupMemberProviderProvider.getIfAvailable();
+        builder.postBuildHook(facade -> {
+            List<BaseHandler> rtcHandlers = new ArrayList<>();
+            rtcHandlers.add(new RtcSignalHandler(facade));
+            if (rtcGroupProvider != null) {
+                rtcHandlers.add(new RtcGroupHandler(facade, rtcGroupProvider));
+            }
+            return rtcHandlers;
+        });
 
         return builder.buildWithServer();
     }
