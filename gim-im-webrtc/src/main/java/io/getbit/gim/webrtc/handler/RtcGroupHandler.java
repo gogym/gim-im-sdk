@@ -6,6 +6,7 @@ import io.getbit.gim.core.spi.ImGroupMemberProvider;
 import io.getbit.gim.protocol.codec.Cmd;
 import io.getbit.gim.protocol.codec.ImProto;
 import io.getbit.gim.protocol.codec.PacketCodec;
+import io.getbit.gim.webrtc.util.RtcSignalValidator;
 import io.netty.channel.Channel;
 
 import java.util.List;
@@ -35,17 +36,22 @@ public class RtcGroupHandler extends BaseHandler {
 
     @Override
     public int cmd() {
-        return Cmd.RTC_GROUP_SIGNAL;
+        return Cmd.RTC_GROUP;
     }
 
     @Override
     public void handle(ImProto.Packet packet, Channel channel, String userId) {
         try {
-            ImProto.RtcGroup groupSignal = PacketCodec.parseRtcGroup(packet);
-            String groupId = groupSignal.getGroupId();
+            ImProto.RtcGroup rtcGroup = PacketCodec.parseRtcGroup(packet);
+            String groupId = rtcGroup.getGroupId();
 
             if (groupId.isEmpty()) {
-                logger.warn("RTC群聊信令缺少群组ID: signalType={}, from={}", groupSignal.getSignalType(), userId);
+                logger.warn("RTC群聊信令缺少群组ID: signalType={}, from={}", rtcGroup.getSignalType(), userId);
+                return;
+            }
+
+            // 使用 DTO 反序列化校验 payload 格式
+            if (!RtcSignalValidator.validateGroupPayload(rtcGroup)) {
                 return;
             }
 
@@ -67,11 +73,11 @@ public class RtcGroupHandler extends BaseHandler {
 
                 // 将群聊信令转换为单聊信令（设置 toUserId），复用现有路由基础设施
                 ImProto.RtcSignal memberSignal = ImProto.RtcSignal.newBuilder()
-                        .setSignalType(groupSignal.getSignalType())
-                        .setFromUserId(groupSignal.getFromUserId())
+                        .setSignalType(rtcGroup.getSignalType())
+                        .setFromUserId(rtcGroup.getFromUserId())
                         .setToUserId(memberId)
-                        .setPayload(groupSignal.getPayload())
-                        .setCallId(groupSignal.getCallId())
+                        .setPayload(rtcGroup.getPayload())
+                        .setCallId(rtcGroup.getCallId())
                         .build();
                 ImProto.Packet fwdPacket = PacketCodec.create(Cmd.RTC_SIGNAL, 0, memberSignal);
 
@@ -85,7 +91,7 @@ public class RtcGroupHandler extends BaseHandler {
             }
 
             logger.debug("RTC群聊信令路由完成: signalType={}, from={}, group={}, members={}, delivered={}, offline={}",
-                    groupSignal.getSignalType(), userId, groupId, memberUserIds.size(), deliveredCount, offlineCount);
+                    rtcGroup.getSignalType(), userId, groupId, memberUserIds.size(), deliveredCount, offlineCount);
 
         } catch (Exception e) {
             logger.error("RTC群聊信令处理失败, userId={}", userId, e);

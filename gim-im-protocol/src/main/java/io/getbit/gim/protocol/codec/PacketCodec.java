@@ -287,7 +287,7 @@ public class PacketCodec {
                 .setGroupId(groupId != null ? groupId : "");
         if (callId != null) { builder.setCallId(callId); }
         if (payload != null) { builder.setPayload(payload); }
-        return create(Cmd.RTC_GROUP_SIGNAL, 0, builder.build());
+        return create(Cmd.RTC_GROUP, 0, builder.build());
     }
 
     public static ImProto.Packet buildKickNotify(int code, String message) {
@@ -331,7 +331,7 @@ public class PacketCodec {
             case Cmd.GROUP_NOTIFY -> ImProto.GroupNotify.parseFrom(packet.getBody());
             case Cmd.GROUP_JOIN_REQUEST_NOTIFY -> ImProto.GroupJoinRequestNotify.parseFrom(packet.getBody());
             case Cmd.RTC_SIGNAL -> ImProto.RtcSignal.parseFrom(packet.getBody());
-            case Cmd.RTC_GROUP_SIGNAL -> ImProto.RtcGroup.parseFrom(packet.getBody());
+            case Cmd.RTC_GROUP -> ImProto.RtcGroup.parseFrom(packet.getBody());
             case Cmd.KICK_NOTIFY -> ImProto.KickNotify.parseFrom(packet.getBody());
             default -> null;
         };

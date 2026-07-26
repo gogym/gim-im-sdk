@@ -86,5 +86,5 @@ public interface Cmd {
     int RTC_SIGNAL = 50;
 
     /** WebRTC 群聊信令消息 */
-    int RTC_GROUP_SIGNAL = 51;
+    int RTC_GROUP = 51;
 }

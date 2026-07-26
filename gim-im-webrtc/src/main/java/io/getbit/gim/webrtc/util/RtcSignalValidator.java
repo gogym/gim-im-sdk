@@ -31,26 +31,41 @@ public class RtcSignalValidator {
     private static final Gson GSON = new Gson();
 
     /**
-     * 根据 signalType 使用对应 DTO 反序列化校验 payload
+     * 校验 RtcSignal 信令的 payload
      *
      * @return true 校验通过，false 校验失败
      */
     public static boolean validatePayload(ImProto.RtcSignal signal) {
-        String payload = signal.getPayload();
-        int type = signal.getSignalType();
+        return validatePayload(signal.getPayload(), signal.getSignalType(), signal.getFromUserId());
+    }
 
+    /**
+     * 校验 RtcGroup 信令的 payload（与 RtcSignal 使用相同的 DTO 校验规则）
+     *
+     * @return true 校验通过，false 校验失败
+     */
+    public static boolean validateGroupPayload(ImProto.RtcGroup groupSignal) {
+        return validatePayload(groupSignal.getPayload(), groupSignal.getSignalType(), groupSignal.getFromUserId());
+    }
+
+    /**
+     * 公共校验逻辑：根据 signalType 使用对应 DTO 反序列化校验 payload
+     *
+     * @return true 校验通过，false 校验失败
+     */
+    private static boolean validatePayload(String payload, int type, String fromUserId) {
         return switch (type) {
             case SIGNAL_OFFER, SIGNAL_ANSWER -> {
-                WebRtcSdpDto dto = parseDto(payload, WebRtcSdpDto.class, signal);
+                WebRtcSdpDto dto = parseDto(payload, WebRtcSdpDto.class, type, fromUserId);
                 yield dto != null && isNotBlank(dto.getSdp());
             }
             case SIGNAL_ICE_CANDIDATE -> {
-                WebRtcIceCandidateDto dto = parseDto(payload, WebRtcIceCandidateDto.class, signal);
+                WebRtcIceCandidateDto dto = parseDto(payload, WebRtcIceCandidateDto.class, type, fromUserId);
                 yield dto != null && isNotBlank(dto.getCandidate())
                         && isNotBlank(dto.getSdpMid()) && dto.getSdpMLineIndex() != null;
             }
             case SIGNAL_CALL_REQUEST -> {
-                WebRtcCallDto dto = parseDto(payload, WebRtcCallDto.class, signal);
+                WebRtcCallDto dto = parseDto(payload, WebRtcCallDto.class, type, fromUserId);
                 yield dto != null && isNotBlank(dto.getCallType());
             }
             case SIGNAL_CALL_ACCEPT -> {
@@ -58,19 +73,19 @@ public class RtcSignalValidator {
                 yield true;
             }
             case SIGNAL_CALL_REJECT -> {
-                WebRtcRejectDto dto = parseDto(payload, WebRtcRejectDto.class, signal);
+                WebRtcRejectDto dto = parseDto(payload, WebRtcRejectDto.class, type, fromUserId);
                 yield dto != null && isNotBlank(dto.getReason());
             }
             case SIGNAL_CALL_CANCEL -> {
-                WebRtcCancelDto dto = parseDto(payload, WebRtcCancelDto.class, signal);
+                WebRtcCancelDto dto = parseDto(payload, WebRtcCancelDto.class, type, fromUserId);
                 yield dto != null && isNotBlank(dto.getReason());
             }
             case SIGNAL_CALL_HANGUP -> {
-                WebRtcHangupDto dto = parseDto(payload, WebRtcHangupDto.class, signal);
+                WebRtcHangupDto dto = parseDto(payload, WebRtcHangupDto.class, type, fromUserId);
                 yield dto != null && isNotBlank(dto.getReason());
             }
             default -> {
-                logger.warn("RTC未知信令类型: signalType={}, from={}", type, signal.getFromUserId());
+                logger.warn("RTC未知信令类型: signalType={}, from={}", type, fromUserId);
                 yield false;
             }
         };
@@ -81,20 +96,20 @@ public class RtcSignalValidator {
      *
      * @return DTO 实例，解析失败返回 null
      */
-    private static <T> T parseDto(String payload, Class<T> clazz, ImProto.RtcSignal signal) {
+    private static <T> T parseDto(String payload, Class<T> clazz, int type, String fromUserId) {
         if (payload == null || payload.isEmpty()) {
-            logger.warn("RTC信令payload为空: signalType={}, from={}", signal.getSignalType(), signal.getFromUserId());
+            logger.warn("RTC信令payload为空: signalType={}, from={}", type, fromUserId);
             return null;
         }
         try {
             T dto = GSON.fromJson(payload, clazz);
             if (dto == null) {
-                logger.warn("RTC信令payload解析为空: signalType={}, from={}", signal.getSignalType(), signal.getFromUserId());
+                logger.warn("RTC信令payload解析为空: signalType={}, from={}", type, fromUserId);
             }
             return dto;
         } catch (Exception e) {
             logger.warn("RTC信令payload解析失败: signalType={}, from={}, error={}",
-                    signal.getSignalType(), signal.getFromUserId(), e.getMessage());
+                    type, fromUserId, e.getMessage());
             return null;
         }
     }
