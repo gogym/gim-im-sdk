@@ -1,7 +1,7 @@
-package io.getbit.gim.core.rtc;
+package io.getbit.gim.webrtc.util;
 
 import com.google.gson.Gson;
-import io.getbit.gim.core.rtc.dto.*;
+import io.getbit.gim.webrtc.dto.*;
 import io.getbit.gim.protocol.codec.ImProto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

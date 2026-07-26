@@ -1,9 +1,7 @@
-package io.getbit.gim.core.message.handler;
+package io.getbit.gim.webrtc.handler;
 
-import io.getbit.gim.core.connection.channel.ChannelManager;
-import io.getbit.gim.core.routing.ClusterMessageRouter;
-import io.getbit.gim.core.routing.UserRouteService;
-import io.getbit.gim.core.spi.ImEventListener;
+import io.getbit.gim.core.bootstrap.IMServerFacade;
+import io.getbit.gim.core.message.handler.BaseHandler;
 import io.getbit.gim.core.spi.ImGroupMemberProvider;
 import io.getbit.gim.protocol.codec.Cmd;
 import io.getbit.gim.protocol.codec.ImProto;
@@ -29,12 +27,9 @@ public class RtcGroupHandler extends BaseHandler {
 
     private final ImGroupMemberProvider groupMemberProvider;
 
-    public RtcGroupHandler(ChannelManager channelManager,
-                           UserRouteService userRouteService,
-                           ClusterMessageRouter clusterMessageRouter,
-                           List<ImEventListener> eventListeners,
+    public RtcGroupHandler(IMServerFacade facade,
                            ImGroupMemberProvider groupMemberProvider) {
-        super(channelManager, userRouteService, clusterMessageRouter, eventListeners);
+        super(facade);
         this.groupMemberProvider = groupMemberProvider;
     }
 

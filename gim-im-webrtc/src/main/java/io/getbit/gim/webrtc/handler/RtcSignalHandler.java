@@ -1,13 +1,11 @@
-package io.getbit.gim.core.message.handler;
+package io.getbit.gim.webrtc.handler;
 
-import io.getbit.gim.core.connection.channel.ChannelManager;
-import io.getbit.gim.core.routing.ClusterMessageRouter;
-import io.getbit.gim.core.routing.UserRouteService;
-import io.getbit.gim.core.rtc.RtcSignalValidator;
-import io.getbit.gim.core.spi.ImEventListener;
+import io.getbit.gim.core.bootstrap.IMServerFacade;
+import io.getbit.gim.core.message.handler.BaseHandler;
 import io.getbit.gim.protocol.codec.Cmd;
 import io.getbit.gim.protocol.codec.ImProto;
 import io.getbit.gim.protocol.codec.PacketCodec;
+import io.getbit.gim.webrtc.util.RtcSignalValidator;
 import io.netty.channel.Channel;
 
 import java.util.List;
@@ -22,11 +20,8 @@ import java.util.List;
  */
 public class RtcSignalHandler extends BaseHandler {
 
-    public RtcSignalHandler(ChannelManager channelManager,
-                            UserRouteService userRouteService,
-                            ClusterMessageRouter clusterMessageRouter,
-                            List<ImEventListener> eventListeners) {
-        super(channelManager, userRouteService, clusterMessageRouter, eventListeners);
+    public RtcSignalHandler(IMServerFacade facade) {
+        super(facade);
     }
 
     @Override

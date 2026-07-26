@@ -8,6 +8,7 @@ import io.getbit.gim.core.connection.health.ImNodeHealthIndicator;
 import io.getbit.gim.core.notify.friend.FriendNotifyService;
 import io.getbit.gim.core.notify.group.GroupNotifyService;
 import io.getbit.gim.core.message.handler.MessageDispatcher;
+import io.getbit.gim.core.routing.ClusterMessageRouter;
 import io.getbit.gim.core.routing.UserRouteService;
 import io.getbit.gim.core.spi.ImEventListener;
 import io.getbit.gim.core.spi.ImRedisAdapter;
@@ -16,6 +17,7 @@ import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -35,7 +37,7 @@ public class IMServerFacade {
     @Getter
     private final ChannelManager channelManager;
     @Getter
-    private final MessageDispatcher messageDispatcher;
+    private MessageDispatcher messageDispatcher;
     @Getter
     private final ConnectionAuthHandler authHandler;
     @Getter
@@ -67,51 +69,105 @@ public class IMServerFacade {
     @Getter
     private ConnectionService connectionService;
 
-    public IMServerFacade(GimProperties config,
-                          ChannelManager channelManager,
-                          MessageDispatcher messageDispatcher,
-                          ConnectionAuthHandler authHandler,
-                          UserRouteService userRouteService,
-                          List<ImEventListener> eventListeners) {
-        this(config, channelManager, messageDispatcher, authHandler, userRouteService, eventListeners, null, null, null, null);
-    }
+    /**
+     * 集群消息路由
+     */
+    @Getter
+    private ClusterMessageRouter clusterRouter;
 
-    public IMServerFacade(GimProperties config,
-                          ChannelManager channelManager,
-                          MessageDispatcher messageDispatcher,
-                          ConnectionAuthHandler authHandler,
-                          UserRouteService userRouteService,
-                          List<ImEventListener> eventListeners,
-                          FriendNotifyService friendNotifyService,
-                          GroupNotifyService groupNotifyService) {
-        this(config, channelManager, messageDispatcher, authHandler, userRouteService, eventListeners,
-                friendNotifyService, groupNotifyService, null, null);
-    }
-
-    public IMServerFacade(GimProperties config,
-                          ChannelManager channelManager,
-                          MessageDispatcher messageDispatcher,
-                          ConnectionAuthHandler authHandler,
-                          UserRouteService userRouteService,
-                          List<ImEventListener> eventListeners,
-                          FriendNotifyService friendNotifyService,
-                          GroupNotifyService groupNotifyService,
-                          ImRedisAdapter redisAdapter,
-                          ImRedisSubscriber redisSubscriber) {
-        this.config = config;
-        this.channelManager = channelManager;
-        this.messageDispatcher = messageDispatcher;
-        this.authHandler = authHandler;
-        this.userRouteService = userRouteService;
-        this.eventListeners = eventListeners;
-        this.friendNotifyService = friendNotifyService;
-        this.groupNotifyService = groupNotifyService;
+    private IMServerFacade(Builder builder) {
+        this.config = builder.config;
+        this.channelManager = builder.channelManager;
+        this.authHandler = builder.authHandler;
+        this.userRouteService = builder.userRouteService;
+        this.eventListeners = builder.eventListeners;
+        this.friendNotifyService = builder.friendNotifyService;
+        this.groupNotifyService = builder.groupNotifyService;
         this.healthIndicator = new ImNodeHealthIndicator(
-                channelManager, userRouteService, redisAdapter, redisSubscriber, config.isEnableCluster());
+                channelManager, userRouteService, builder.redisAdapter,
+                builder.redisSubscriber, config.isEnableCluster());
         this.connectionService = new ConnectionService(channelManager, userRouteService, this);
 
         logger.info("IMServerFacade 初始化完成, serverId={}, cluster={}",
                 config.getServerId(), config.isEnableCluster());
+    }
+
+    /**
+     * IMServerFacade 构建器
+     */
+    public static class Builder {
+        private GimProperties config;
+        private ChannelManager channelManager;
+        private ConnectionAuthHandler authHandler;
+        private UserRouteService userRouteService;
+        private List<ImEventListener> eventListeners = Collections.emptyList();
+        private FriendNotifyService friendNotifyService;
+        private GroupNotifyService groupNotifyService;
+        private ImRedisAdapter redisAdapter;
+        private ImRedisSubscriber redisSubscriber;
+
+        public Builder config(GimProperties config) {
+            this.config = config;
+            return this;
+        }
+
+        public Builder channelManager(ChannelManager channelManager) {
+            this.channelManager = channelManager;
+            return this;
+        }
+
+        public Builder authHandler(ConnectionAuthHandler authHandler) {
+            this.authHandler = authHandler;
+            return this;
+        }
+
+        public Builder userRouteService(UserRouteService userRouteService) {
+            this.userRouteService = userRouteService;
+            return this;
+        }
+
+        public Builder eventListeners(List<ImEventListener> eventListeners) {
+            this.eventListeners = eventListeners != null ? eventListeners : Collections.emptyList();
+            return this;
+        }
+
+        public Builder friendNotifyService(FriendNotifyService friendNotifyService) {
+            this.friendNotifyService = friendNotifyService;
+            return this;
+        }
+
+        public Builder groupNotifyService(GroupNotifyService groupNotifyService) {
+            this.groupNotifyService = groupNotifyService;
+            return this;
+        }
+
+        public Builder redisAdapter(ImRedisAdapter redisAdapter) {
+            this.redisAdapter = redisAdapter;
+            return this;
+        }
+
+        public Builder redisSubscriber(ImRedisSubscriber redisSubscriber) {
+            this.redisSubscriber = redisSubscriber;
+            return this;
+        }
+
+        public IMServerFacade build() {
+            return new IMServerFacade(this);
+        }
+    }
+
+    /**
+     * 设置消息分发器（由 GimBootstrap 组装后注入）
+     */
+    void setMessageDispatcher(MessageDispatcher messageDispatcher) {
+        this.messageDispatcher = messageDispatcher;
+    }
+
+    /**
+     * 设置集群消息路由（由 GimBootstrap 内部组装后注入）
+     */
+    void setClusterRouter(ClusterMessageRouter clusterRouter) {
+        this.clusterRouter = clusterRouter;
     }
 
     /**

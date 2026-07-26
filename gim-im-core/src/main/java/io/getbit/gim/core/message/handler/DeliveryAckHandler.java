@@ -1,10 +1,7 @@
 package io.getbit.gim.core.message.handler;
 
-import io.getbit.gim.core.connection.channel.ChannelManager;
+import io.getbit.gim.core.bootstrap.IMServerFacade;
 import io.getbit.gim.core.message.ack.MessageAckTracker;
-import io.getbit.gim.core.routing.ClusterMessageRouter;
-import io.getbit.gim.core.routing.UserRouteService;
-import io.getbit.gim.core.spi.ImEventListener;
 import io.getbit.gim.protocol.codec.Cmd;
 import io.getbit.gim.protocol.codec.ImProto;
 import io.getbit.gim.protocol.codec.PacketCodec;
@@ -24,12 +21,9 @@ public class DeliveryAckHandler extends BaseHandler {
 
     private final MessageAckTracker ackTracker;
 
-    public DeliveryAckHandler(ChannelManager channelManager,
-                              UserRouteService userRouteService,
-                              ClusterMessageRouter clusterMessageRouter,
-                              List<ImEventListener> eventListeners,
+    public DeliveryAckHandler(IMServerFacade facade,
                               MessageAckTracker ackTracker) {
-        super(channelManager, userRouteService, clusterMessageRouter, eventListeners);
+        super(facade);
         this.ackTracker = ackTracker;
     }
 

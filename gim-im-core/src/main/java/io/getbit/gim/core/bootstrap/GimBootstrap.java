@@ -225,45 +225,48 @@ public class GimBootstrap {
             GroupNotifyService groupNotifyService = new GroupNotifyService(
                     channelManager, userRouteService, clusterRouter, groupProvider, listeners);
 
-            // ========== 消息处理器 ==========
+            // ========== 先创建门面（Dispatcher 后置注入） ==========
 
-            HeartbeatHandler heartbeatHandler = new HeartbeatHandler(
-                    channelManager, userRouteService, clusterRouter, listeners);
+            IMServerFacade facade = new IMServerFacade.Builder()
+                    .config(config)
+                    .channelManager(channelManager)
+                    .authHandler(authHandler)
+                    .userRouteService(userRouteService)
+                    .eventListeners(listeners)
+                    .friendNotifyService(friendNotifyService)
+                    .groupNotifyService(groupNotifyService)
+                    .redisAdapter(redisAdapter)
+                    .redisSubscriber(subscriber)
+                    .build();
+
+            // 注入 ClusterMessageRouter 到门面，供 Handler 构造时使用
+            facade.setClusterRouter(clusterRouter);
+
+            // ========== 消息处理器（通过 facade 注入依赖） ==========
+
+            HeartbeatHandler heartbeatHandler = new HeartbeatHandler(facade);
 
             SingleChatHandler singleChatHandler = new SingleChatHandler(
-                    channelManager, userRouteService, clusterRouter, listeners,
-                    idGenerator, messageAckTracker, friendProvider);
+                    facade, idGenerator, messageAckTracker, friendProvider);
 
             GroupChatHandler groupChatHandler = new GroupChatHandler(
-                    channelManager, userRouteService, clusterRouter, listeners,
-                    idGenerator, messageAckTracker, groupProvider);
+                    facade, idGenerator, messageAckTracker, groupProvider);
 
             DeliveryAckHandler deliveryAckHandler = new DeliveryAckHandler(
-                    channelManager, userRouteService, clusterRouter, listeners, messageAckTracker);
+                    facade, messageAckTracker);
 
-            ReadReceiptHandler readReceiptHandler = new ReadReceiptHandler(
-                    channelManager, userRouteService, clusterRouter, listeners);
+            ReadReceiptHandler readReceiptHandler = new ReadReceiptHandler(facade);
 
-            MsgRecallHandler msgRecallHandler = new MsgRecallHandler(
-                    channelManager, userRouteService, clusterRouter, listeners, groupProvider);
+            MsgRecallHandler msgRecallHandler = new MsgRecallHandler(facade, groupProvider);
 
-            RtcSignalHandler rtcSignalHandler = new RtcSignalHandler(
-                    channelManager, userRouteService, clusterRouter, listeners);
-
-            RtcGroupHandler rtcGroupHandler = new RtcGroupHandler(
-                    channelManager, userRouteService, clusterRouter, listeners, groupProvider);
-
-            // 消息分发器
+            // 消息分发器（RTC Handler 由外部模块通过 registerHandler 动态注册）
             List<BaseHandler> handlers = List.of(
                     heartbeatHandler, singleChatHandler, groupChatHandler,
-                    deliveryAckHandler, readReceiptHandler, msgRecallHandler,
-                    rtcSignalHandler, rtcGroupHandler);
+                    deliveryAckHandler, readReceiptHandler, msgRecallHandler);
             DefaultMessageDispatcher messageDispatcher = new DefaultMessageDispatcher(handlers);
 
-            // 门面（内置 ImNodeHealthIndicator，传入 Redis 组件用于健康检查）
-            IMServerFacade facade = new IMServerFacade(
-                    config, channelManager, messageDispatcher, authHandler, userRouteService,
-                    listeners, friendNotifyService, groupNotifyService, redisAdapter, subscriber);
+            // 注入 Dispatcher 到门面
+            facade.setMessageDispatcher(messageDispatcher);
 
             // 注入 MessageAckTracker 到健康指标，用于监控待确认消息数
             facade.getHealthIndicator().setMessageAckTracker(messageAckTracker);

@@ -1,10 +1,7 @@
 package io.getbit.gim.core.message.handler;
 
-import io.getbit.gim.core.connection.channel.ChannelManager;
+import io.getbit.gim.core.bootstrap.IMServerFacade;
 import io.getbit.gim.core.message.ack.MessageAckTracker;
-import io.getbit.gim.core.routing.ClusterMessageRouter;
-import io.getbit.gim.core.routing.UserRouteService;
-import io.getbit.gim.core.spi.ImEventListener;
 import io.getbit.gim.core.spi.ImFriendProvider;
 import io.getbit.gim.core.spi.ImIdGenerator;
 import io.getbit.gim.protocol.codec.Cmd;
@@ -35,14 +32,11 @@ public class SingleChatHandler extends BaseHandler {
     private final MessageAckTracker ackTracker;
     private final ImFriendProvider friendProvider;
 
-    public SingleChatHandler(ChannelManager channelManager,
-                             UserRouteService userRouteService,
-                             ClusterMessageRouter clusterMessageRouter,
-                             List<ImEventListener> eventListeners,
+    public SingleChatHandler(IMServerFacade facade,
                              ImIdGenerator idGenerator,
                              MessageAckTracker ackTracker,
                              ImFriendProvider friendProvider) {
-        super(channelManager, userRouteService, clusterMessageRouter, eventListeners);
+        super(facade);
         this.idGenerator = idGenerator;
         this.ackTracker = ackTracker;
         this.friendProvider = friendProvider;

@@ -1,5 +1,6 @@
 package io.getbit.gim.core.message.handler;
 
+import io.getbit.gim.core.bootstrap.IMServerFacade;
 import io.getbit.gim.core.connection.channel.ChannelManager;
 import io.getbit.gim.core.routing.ClusterMessageRouter;
 import io.getbit.gim.core.routing.UserRouteService;
@@ -31,19 +32,19 @@ public abstract class BaseHandler {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
+    protected final IMServerFacade facade;
     protected final ChannelManager channelManager;
     protected final UserRouteService userRouteService;
     protected final ClusterMessageRouter clusterMessageRouter;
     protected final List<ImEventListener> eventListeners;
 
-    protected BaseHandler(ChannelManager channelManager,
-                          UserRouteService userRouteService,
-                          ClusterMessageRouter clusterMessageRouter,
-                          List<ImEventListener> eventListeners) {
-        this.channelManager = channelManager;
-        this.userRouteService = userRouteService;
-        this.clusterMessageRouter = clusterMessageRouter;
-        this.eventListeners = eventListeners != null ? eventListeners : Collections.emptyList();
+    protected BaseHandler(IMServerFacade facade) {
+        this.facade = facade;
+        this.channelManager = facade.getChannelManager();
+        this.userRouteService = facade.getUserRouteService();
+        this.clusterMessageRouter = facade.getClusterRouter();
+        this.eventListeners = facade.getEventListeners() != null
+                ? facade.getEventListeners() : Collections.emptyList();
     }
 
     // ====================== 子类必须实现 ======================

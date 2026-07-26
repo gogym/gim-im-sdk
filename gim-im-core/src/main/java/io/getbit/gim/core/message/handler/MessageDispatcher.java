@@ -17,4 +17,11 @@ public interface MessageDispatcher {
      * 按 packet.cmd 路由到对应 Handler
      */
     void dispatch(ImProto.Packet packet, Channel channel, String userId);
+
+    /**
+     * 动态注册 Handler（用于外部模块扩展）
+     *
+     * @param handler 消息处理器
+     */
+    void registerHandler(BaseHandler handler);
 }

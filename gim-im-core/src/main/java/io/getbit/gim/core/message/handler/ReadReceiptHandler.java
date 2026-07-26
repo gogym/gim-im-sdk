@@ -1,8 +1,6 @@
 package io.getbit.gim.core.message.handler;
 
-import io.getbit.gim.core.connection.channel.ChannelManager;
-import io.getbit.gim.core.routing.ClusterMessageRouter;
-import io.getbit.gim.core.routing.UserRouteService;
+import io.getbit.gim.core.bootstrap.IMServerFacade;
 import io.getbit.gim.core.spi.ImEventListener;
 import io.getbit.gim.protocol.codec.Cmd;
 import io.getbit.gim.protocol.codec.ImProto;
@@ -26,11 +24,8 @@ import java.util.List;
  */
 public class ReadReceiptHandler extends BaseHandler {
 
-    public ReadReceiptHandler(ChannelManager channelManager,
-                              UserRouteService userRouteService,
-                              ClusterMessageRouter clusterMessageRouter,
-                              List<ImEventListener> eventListeners) {
-        super(channelManager, userRouteService, clusterMessageRouter, eventListeners);
+    public ReadReceiptHandler(IMServerFacade facade) {
+        super(facade);
     }
 
     @Override

@@ -1,4 +1,4 @@
-package io.getbit.gim.core.rtc.dto;
+package io.getbit.gim.webrtc.dto;
 
 import lombok.Data;
 

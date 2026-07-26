@@ -5,9 +5,9 @@ import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * DefaultMessageDispatcher.java
@@ -25,15 +25,19 @@ public class DefaultMessageDispatcher implements MessageDispatcher {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultMessageDispatcher.class);
 
-    /** cmd → Handler 映射 */
-    private final Map<Integer, BaseHandler> cmdHandlerMap;
+    /** cmd → Handler 映射（线程安全，支持动态注册） */
+    private final Map<Integer, BaseHandler> cmdHandlerMap = new ConcurrentHashMap<>();
 
     public DefaultMessageDispatcher(List<BaseHandler> handlers) {
-        this.cmdHandlerMap = new HashMap<>();
         for (BaseHandler handler : handlers) {
-            cmdHandlerMap.put(handler.cmd(), handler);
-            logger.info("注册消息处理器: cmd={}, handler={}", handler.cmd(), handler.getClass().getSimpleName());
+            registerHandler(handler);
         }
+    }
+
+    @Override
+    public void registerHandler(BaseHandler handler) {
+        cmdHandlerMap.put(handler.cmd(), handler);
+        logger.info("注册消息处理器: cmd={}, handler={}", handler.cmd(), handler.getClass().getSimpleName());
     }
 
     @Override

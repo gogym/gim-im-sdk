@@ -1,9 +1,6 @@
 package io.getbit.gim.core.message.handler;
 
-import io.getbit.gim.core.connection.channel.ChannelManager;
-import io.getbit.gim.core.routing.ClusterMessageRouter;
-import io.getbit.gim.core.routing.UserRouteService;
-import io.getbit.gim.core.spi.ImEventListener;
+import io.getbit.gim.core.bootstrap.IMServerFacade;
 import io.getbit.gim.protocol.codec.Cmd;
 import io.getbit.gim.protocol.codec.ImProto;
 import io.getbit.gim.protocol.codec.PacketCodec;
@@ -20,11 +17,8 @@ import java.util.List;
  */
 public class HeartbeatHandler extends BaseHandler {
 
-    public HeartbeatHandler(ChannelManager channelManager,
-                            UserRouteService userRouteService,
-                            ClusterMessageRouter clusterMessageRouter,
-                            List<ImEventListener> eventListeners) {
-        super(channelManager, userRouteService, clusterMessageRouter, eventListeners);
+    public HeartbeatHandler(IMServerFacade facade) {
+        super(facade);
     }
 
     @Override
