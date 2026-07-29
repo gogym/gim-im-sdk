@@ -19,7 +19,7 @@
 
     <properties>
         <java.version>17</java.version>
-        <gim-im-sdk.version>1.0.1-SNAPSHOT</gim-im-sdk.version>
+        <gim-sdk-java.version>1.0.1-SNAPSHOT</gim-sdk-java.version>
     </properties>
 
     <dependencies>
@@ -29,7 +29,7 @@
         <dependency>
             <groupId>io.getbit</groupId>
             <artifactId>gim-im-starter</artifactId>
-            <version>${gim-im-sdk.version}</version>
+            <version>${gim-sdk-java.version}</version>
         </dependency>
 
         <!-- Spring Boot Web（提供 HTTP API 服务） -->

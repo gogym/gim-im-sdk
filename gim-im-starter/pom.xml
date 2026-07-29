@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>io.getbit</groupId>
-        <artifactId>gim-im-sdk</artifactId>
+        <artifactId>gim-sdk-java</artifactId>
         <version>1.0.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -22,7 +22,7 @@
         <dependency>
             <groupId>io.getbit</groupId>
             <artifactId>gim-im-webrtc</artifactId>
-            <version>${gim-im-sdk.version}</version>
+            <version>${gim-sdk-java.version}</version>
         </dependency>
 
         <!-- Spring Boot -->

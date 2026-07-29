@@ -5,13 +5,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.getbit</groupId>
-    <artifactId>gim-im-sdk</artifactId>
+    <artifactId>gim-sdk-java</artifactId>
     <version>1.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>GIM IM SDK</name>
+    <name>GIM SDK Java</name>
     <description>High-performance, cluster-ready IM SDK based on Netty + Protobuf</description>
-    <url>https://github.com/gogym/gim-im-sdk</url>
+    <url>https://github.com/gogym/gim-sdk-java</url>
 
     <licenses>
         <license>
@@ -43,7 +43,7 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
 
-        <gim-im-sdk.version>1.0.1-SNAPSHOT</gim-im-sdk.version>
+        <gim-sdk-java.version>1.0.1-SNAPSHOT</gim-sdk-java.version>
 
         <spring-boot.version>3.5.3</spring-boot.version>
         <netty.version>4.1.117.Final</netty.version>
@@ -69,22 +69,22 @@
             <dependency>
                 <groupId>io.getbit</groupId>
                 <artifactId>gim-im-protocol</artifactId>
-                <version>${gim-im-sdk.version}</version>
+                <version>${gim-sdk-java.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.getbit</groupId>
                 <artifactId>gim-im-core</artifactId>
-                <version>${gim-im-sdk.version}</version>
+                <version>${gim-sdk-java.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.getbit</groupId>
                 <artifactId>gim-im-webrtc</artifactId>
-                <version>${gim-im-sdk.version}</version>
+                <version>${gim-sdk-java.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.getbit</groupId>
                 <artifactId>gim-im-starter</artifactId>
-                <version>${gim-im-sdk.version}</version>
+                <version>${gim-sdk-java.version}</version>
             </dependency>
 
             <!-- Netty -->
